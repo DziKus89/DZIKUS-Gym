@@ -7,54 +7,73 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dzikus Gym">
+<link rel="manifest" href="manifest.json">
 <title>Dzikus Gym – Patryk Kuczer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d0d14;--bg2:#161622;--bg3:#1f1f30;--bg4:#272738;--accent:#ff3c2f;--gold:#f5c842;--text:#f0f0f8;--muted:#7070a0;--muted2:#4a4a6a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--green:#2ecc71;--red:#e74c3c;--blue:#3498db;--r:12px;--rs:8px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:100%}
-body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden;padding-bottom:80px}
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.6}
-.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 14px}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:80px}
+.app{max-width:480px;margin:0 auto;padding:0 14px;position:relative;z-index:1}
+/* AUTH SCREEN */
+.auth-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.auth-screen.hidden{display:none}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;margin-bottom:6px}
+.auth-logo span{color:var(--accent)}
+.auth-sub{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:40px}
+.auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;width:100%;max-width:360px}
+.auth-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.auth-field{margin-bottom:12px}
+.auth-field label{font-size:11px;color:var(--muted);font-weight:500;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.auth-field input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;width:100%;outline:none}
+.auth-field input:focus{border-color:var(--accent)}
+.auth-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:var(--rs);font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:.5px}
+.auth-err{font-size:12px;color:var(--red);margin-top:8px;text-align:center;min-height:18px}
+.auth-sync-info{font-size:11px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.6}
+/* SYNC STATUS */
+.sync-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:12px;font-size:12px;color:var(--muted)}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted2);flex-shrink:0}
+.sync-dot.synced{background:var(--green)}
+.sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-user{margin-left:auto;font-size:11px;color:var(--muted2);cursor:pointer}
 /* NAV */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:100;width:100%;max-width:480px}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 2px 14px;font-size:9px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;transition:color .15s;letter-spacing:.3px;font-family:'Barlow',sans-serif}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 2px 14px;font-size:9px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;font-family:'Barlow',sans-serif;letter-spacing:.3px}
 .nav-btn svg{width:20px;height:20px}
 .nav-btn.active{color:var(--accent)}
 /* PAGES */
 .page{display:none;animation:fadeIn .2s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-/* LOGO */
-.logo-header{padding:28px 0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:20px}
-.logo-wrap{display:flex;align-items:center;gap:12px}
-.logo-mark{width:48px;height:48px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden}
-.logo-mark::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%)}
-.logo-mark svg{width:28px;height:28px;fill:#fff;position:relative;z-index:1}
-.logo-name{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;letter-spacing:2px}
+/* HEADER */
+.logo-header{padding:20px 0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:16px}
+.logo-name{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;letter-spacing:2px}
 .logo-name span{color:var(--accent)}
-.logo-sub{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:500}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:500}
 .header-date{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
-.header-date strong{display:block;font-size:15px;color:var(--text);font-weight:500}
-/* TITLES */
-.sec-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.sec-title span{width:3px;height:18px;background:var(--accent);border-radius:2px;display:inline-block;flex-shrink:0}
+.header-date strong{display:block;font-size:14px;color:var(--text);font-weight:500}
+/* SEC TITLE */
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-title span{width:3px;height:16px;background:var(--accent);border-radius:2px;display:inline-block;flex-shrink:0}
 /* CARDS */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
-.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
 /* METRICS */
-.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
 .metric{background:var(--bg3);border-radius:var(--rs);padding:12px 14px}
 .metric-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:500;margin-bottom:4px}
-.metric-val{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
+.metric-val{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1}
 .metric-val.accent{color:var(--accent)}.metric-val.gold{color:var(--gold)}.metric-val.green{color:var(--green)}
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:var(--rs);font-family:'Barlow',sans-serif;font-weight:600;font-size:14px;cursor:pointer;border:none;transition:opacity .15s,transform .1s;letter-spacing:.3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:var(--rs);font-family:'Barlow',sans-serif;font-weight:600;font-size:14px;cursor:pointer;border:none;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
 .btn-primary{background:var(--accent);color:#fff;width:100%}
-.btn-primary:hover{opacity:.9}
 .btn-ghost{background:none;color:var(--muted);border:1px solid var(--border2);font-size:13px;padding:8px 14px}
 .btn-ghost:hover{color:var(--text)}
 .btn-danger{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.3)}
@@ -62,27 +81,28 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* INPUTS */
 input,select,textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;width:100%;outline:none;transition:border-color .15s;-webkit-appearance:none}
 input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-input::placeholder,textarea::placeholder{color:var(--muted2)}
+input::placeholder{color:var(--muted2)}
 select option{background:var(--bg2)}
 label{font-size:12px;color:var(--muted);font-weight:500;display:block;margin-bottom:5px;letter-spacing:.3px}
 /* CHIPS */
 .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.chip{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all .12s;font-family:'Barlow',sans-serif}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-family:'Barlow',sans-serif}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 /* BADGES */
-.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:rgba(46,204,113,.15);color:var(--green)}
 .badge-gold{background:rgba(245,200,66,.12);color:var(--gold)}
 .badge-blue{background:rgba(52,152,219,.15);color:var(--blue)}
 .badge-muted{background:var(--bg3);color:var(--muted)}
 .badge-shoulder{background:rgba(46,204,113,.12);color:#27ae60;border:1px solid rgba(46,204,113,.2)}
-/* TIMER */
-.timer-ring{position:relative;display:flex;align-items:center;justify-content:center}
-.timer-ring svg{transform:rotate(-90deg)}
-.timer-center{position:absolute;text-align:center}
-.timer-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1}
-.timer-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
-/* EXERCISE ROWS */
+/* STREAK */
+.streak-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.streak-day{aspect-ratio:1;border-radius:4px;background:var(--bg3)}
+.streak-day.done{background:var(--accent)}
+.streak-day.today{border:2px solid var(--accent);background:rgba(255,60,47,.15)}
+.streak-label-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.streak-label{font-size:9px;color:var(--muted);text-align:center;text-transform:uppercase}
+/* WORKOUT */
 .ex-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
 .ex-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;gap:8px}
 .ex-name{font-weight:600;font-size:14px;flex:1;line-height:1.3}
@@ -92,59 +112,48 @@ label{font-size:12px;color:var(--muted);font-weight:500;display:block;margin-bot
 .ex-note{font-size:12px;color:var(--muted);font-style:italic;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:10px;line-height:1.5}
 .ex-chevron{width:18px;height:18px;color:var(--muted);transition:transform .2s;flex-shrink:0}
 .ex-row.open .ex-chevron{transform:rotate(180deg)}
-/* SET ROWS */
-.set-header{display:grid;grid-template-columns:30px 1fr 1fr 40px;gap:6px;font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;padding:0 2px}
-.set-row{display:grid;grid-template-columns:30px 1fr 1fr 40px;gap:6px;align-items:center;margin-bottom:6px}
-.set-num{width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);flex-shrink:0}
+.set-header{display:grid;grid-template-columns:28px 1fr 1fr 38px;gap:6px;font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;margin-bottom:6px}
+.set-row{display:grid;grid-template-columns:28px 1fr 1fr 38px;gap:6px;align-items:center;margin-bottom:6px}
+.set-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);flex-shrink:0}
 .set-num.done{background:rgba(46,204,113,.15);color:var(--green)}
 .set-input{padding:8px 10px;font-size:14px;font-weight:600;text-align:center}
-.btn-set-done{width:36px;height:36px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.btn-set-done{width:34px;height:34px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .btn-set-done.done{background:rgba(46,204,113,.15);border-color:rgba(46,204,113,.3);color:var(--green)}
-.btn-set-done svg{width:16px;height:16px}
-/* REST OVERLAY */
-.rest-overlay{position:fixed;inset:0;background:rgba(13,13,20,.96);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.rest-overlay.show{display:flex}
-.rest-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--muted)}
-/* KILL BANNER */
+.btn-set-done svg{width:15px;height:15px}
+.workout-timer-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.wt-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.wt-time{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);line-height:1}
+.wt-vol{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;text-align:right}
+.onerm-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--gold);background:rgba(245,200,66,.1);border-radius:20px;padding:3px 9px;margin-top:6px}
 .kill-banner{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:var(--rs);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--red);line-height:1.5}
 .kill-banner strong{display:block;margin-bottom:3px;font-size:13px}
+/* REST */
+.rest-overlay{position:fixed;inset:0;background:rgba(13,13,20,.96);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.rest-overlay.show{display:flex}
+.timer-ring{position:relative;display:flex;align-items:center;justify-content:center}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-center{position:absolute;text-align:center}
+.timer-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1}
+.timer-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
 /* HISTORY */
 .hist-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer}
 .hist-item:hover{border-color:var(--border2)}
 .hist-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .hist-day{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px}
 .hist-stats{display:flex;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
-.hist-stats span{display:flex;align-items:center;gap:4px}
 /* CHART */
 .chart-wrap{position:relative;width:100%;height:140px;margin:8px 0}
 canvas{width:100%;height:100%}
-/* STREAK */
-.streak-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
-.streak-day{aspect-ratio:1;border-radius:4px;background:var(--bg3)}
-.streak-day.done{background:var(--accent)}
-.streak-day.today{border:2px solid var(--accent);background:rgba(255,60,47,.15)}
-.streak-label-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
-.streak-label{font-size:9px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.3px}
 /* MODAL */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;display:none;align-items:flex-end;justify-content:center}
 .modal-bg.show{display:flex}
 .modal{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 16px 36px;border-top:1px solid var(--border);max-height:90vh;overflow-y:auto}
 .modal-handle{width:40px;height:4px;background:var(--bg4);border-radius:2px;margin:0 auto 16px}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:16px}
-/* SCROLLBAR */
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
-.divider{height:1px;background:var(--border);margin:16px 0}
+.divider{height:1px;background:var(--border);margin:14px 0}
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
-.empty svg{width:44px;height:44px;margin:0 auto 12px;display:block;opacity:.3}
+.empty svg{width:40px;height:40px;margin:0 auto 12px;display:block;opacity:.3}
 .empty p{font-size:14px;line-height:1.6}
-/* WORKOUT */
-.workout-timer-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-.wt-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
-.wt-time{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);line-height:1}
-.wt-vol{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;text-align:right}
-.onerm-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--gold);background:rgba(245,200,66,.1);border-radius:20px;padding:3px 9px;margin-top:6px}
 /* EXERCISE DB */
 .ex-db-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
 .ex-db-header{display:flex;align-items:flex-start;justify-content:space-between;padding:12px 14px;gap:8px;cursor:pointer}
@@ -161,33 +170,65 @@ canvas{width:100%;height:100%}
 /* FILTERS */
 .filter-bar{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none}
 .filter-bar::-webkit-scrollbar{display:none}
-.filter-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:'Barlow',sans-serif;transition:all .12s;flex-shrink:0}
+.filter-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:'Barlow',sans-serif;flex-shrink:0}
 .filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .filter-chip.active-outline{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 /* PLANS */
 .plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
 .plan-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer}
-.plan-num{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);letter-spacing:1px}
+.plan-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);letter-spacing:1px}
 .plan-card-body{border-top:1px solid var(--border);padding:14px 16px;display:none}
 .plan-card.open .plan-card-body{display:block}
 .plan-card.open .plan-chevron{transform:rotate(180deg)}
-.plan-chevron{width:16px;height:16px;color:var(--muted);transition:transform .2s;flex-shrink:0}
-.plan-ex-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;gap:8px}
+.plan-chevron{width:16px;height:16px;color:var(--muted);transition:transform .2s}
+.plan-ex-item{display:flex;align-items:center;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;gap:8px}
 .plan-ex-name{font-size:13px;font-weight:500;flex:1;line-height:1.3}
 .plan-ex-meta{font-size:11px;color:var(--muted);margin-top:1px}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-logo"><span>DZIKUS</span> GYM</div>
+  <div class="auth-sub">Patryk Kuczer · Dziennik treningowy</div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Logowanie</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">Rejestracja</div>
+    </div>
+    <div id="auth-login">
+      <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="twoj@email.com" autocomplete="email"/></div>
+      <div class="auth-field"><label>Hasło</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/></div>
+      <button class="auth-btn" onclick="doLogin()">Zaloguj się</button>
+      <div style="text-align:center;margin-top:10px"><span style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline" onclick="doResetPassword()">Zapomniałem hasła</span></div>
+    </div>
+    <div id="auth-register" style="display:none">
+      <div class="auth-field"><label>Email</label><input type="email" id="reg-email" placeholder="twoj@email.com" autocomplete="email"/></div>
+      <div class="auth-field"><label>Hasło (min. 6 znaków)</label><input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password"/></div>
+      <div class="auth-field"><label>Powtórz hasło</label><input type="password" id="reg-pass2" placeholder="••••••••" autocomplete="new-password"/></div>
+      <button class="auth-btn" onclick="doRegister()">Utwórz konto</button>
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-sync-info">🔒 Dane zapisywane w chmurze Firebase<br>Dostęp z każdego urządzenia</div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
 
 <!-- HOME -->
 <div class="page active" id="page-home">
   <div class="logo-header">
-    <div class="logo-wrap">
-      <div class="logo-mark"><svg viewBox="0 0 32 32"><path d="M4 12h2V8h4v4h8V8h4v4h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2v4h-4v-4H10v4H6v-4H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"/></svg></div>
-      <div><div class="logo-name"><span>DZIKUS</span> GYM</div><div class="logo-sub">Patryk Kuczer · Dziennik</div></div>
-    </div>
+    <div><div class="logo-name"><span>DZIKUS</span> GYM</div><div class="logo-sub">Patryk Kuczer · Dziennik</div></div>
     <div class="header-date" id="home-date"></div>
+  </div>
+  <div class="sync-bar" id="sync-bar">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-text">Łączenie...</span>
+    <span class="sync-user" id="sync-user" onclick="doLogout()">Wyloguj</span>
   </div>
   <div class="sec-title"><span></span>Aktywność – ostatnie 28 dni</div>
   <div class="card" style="padding:14px">
@@ -218,16 +259,16 @@ canvas{width:100%;height:100%}
 
 <!-- WORKOUT -->
 <div class="page" id="page-workout">
-  <div style="padding:20px 0 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:16px">
+  <div style="padding:20px 0 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:14px">
     <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Trening aktywny</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px" id="workout-title">–</div></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px" id="workout-title">–</div></div>
     <button class="btn btn-ghost btn-sm" onclick="finishWorkout()">Zakończ</button>
   </div>
   <div class="workout-timer-bar">
-    <div><div class="wt-label">Czas treningu</div><div class="wt-time" id="workout-clock">00:00</div></div>
+    <div><div class="wt-label">Czas</div><div class="wt-time" id="workout-clock">00:00</div></div>
     <div style="text-align:right"><div class="wt-label">Objętość</div><div class="wt-vol" id="workout-vol">0 kg</div></div>
   </div>
-  <div class="kill-banner"><strong>⚠ Kill criteria – barki</strong>Ostry ból / utrata siły / promieniowanie w ramię / ból nocny → STOP natychmiast</div>
+  <div class="kill-banner"><strong>⚠ Kill criteria – barki</strong>Ostry ból / utrata siły / promieniowanie w ramię / ból nocny → STOP</div>
   <div id="exercises-list"></div>
   <button class="btn btn-primary" style="margin-top:8px" onclick="finishWorkout()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Zakończ trening
@@ -236,8 +277,8 @@ canvas{width:100%;height:100%}
 
 <!-- HISTORY -->
 <div class="page" id="page-history">
-  <div class="logo-header" style="margin-bottom:16px">
-    <div><div class="logo-name" style="font-size:22px">Historia</div><div class="logo-sub">Wszystkie treningi</div></div>
+  <div class="logo-header" style="margin-bottom:14px">
+    <div><div class="logo-name" style="font-size:20px">Historia</div><div class="logo-sub">Wszystkie treningi</div></div>
     <button class="btn btn-ghost btn-sm" onclick="showPage('page-progress')">Wykresy →</button>
   </div>
   <div id="history-list"></div>
@@ -245,11 +286,11 @@ canvas{width:100%;height:100%}
 
 <!-- PROGRESS -->
 <div class="page" id="page-progress">
-  <div class="logo-header" style="margin-bottom:16px">
-    <div><div class="logo-name" style="font-size:22px">Postępy</div><div class="logo-sub">Siła · Objętość · 1RM</div></div>
+  <div class="logo-header" style="margin-bottom:14px">
+    <div><div class="logo-name" style="font-size:20px">Postępy</div><div class="logo-sub">Siła · Objętość · 1RM</div></div>
   </div>
   <div class="sec-title"><span></span>Wybierz ćwiczenie</div>
-  <select id="progress-ex-select" onchange="renderProgressChart()" style="margin-bottom:16px"></select>
+  <select id="progress-ex-select" onchange="renderProgressChart()" style="margin-bottom:14px"></select>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <div style="font-size:13px;font-weight:600" id="prog-ex-name">–</div>
@@ -259,20 +300,20 @@ canvas{width:100%;height:100%}
     <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted)" id="prog-axis"></div>
   </div>
   <div class="metric-grid" style="margin-top:4px">
-    <div class="metric"><div class="metric-label">Max ciężar</div><div class="metric-val accent" id="prog-max-kg">– kg</div></div>
-    <div class="metric"><div class="metric-label">Sesje łącznie</div><div class="metric-val" id="prog-sessions">–</div></div>
-    <div class="metric"><div class="metric-label">Tyg. objętość</div><div class="metric-val green" id="prog-week-vol">– kg</div></div>
+    <div class="metric"><div class="metric-label">Max ciężar</div><div class="metric-val accent" id="prog-max-kg">–</div></div>
+    <div class="metric"><div class="metric-label">Sesje</div><div class="metric-val" id="prog-sessions">–</div></div>
+    <div class="metric"><div class="metric-label">Tyg. objętość</div><div class="metric-val green" id="prog-week-vol">–</div></div>
     <div class="metric"><div class="metric-label">Progres</div><div class="metric-val gold" id="prog-trend">–</div></div>
   </div>
-  <div class="sec-title" style="margin-top:8px"><span></span>Objętość tygodniowa per partia</div>
+  <div class="sec-title" style="margin-top:8px"><span></span>Objętość tygodniowa</div>
   <div class="card" id="vol-breakdown"></div>
 </div>
 
-<!-- BAZA ĆWICZEŃ -->
+<!-- BAZA -->
 <div class="page" id="page-exercises">
-  <div class="logo-header" style="margin-bottom:12px">
-    <div><div class="logo-name" style="font-size:22px">Baza ćwiczeń</div><div class="logo-sub">Technika · YouTube · Plany</div></div>
-    <button class="btn btn-ghost btn-sm" onclick="openModal('modal-add-ex')">+ Dodaj własne</button>
+  <div class="logo-header" style="margin-bottom:10px">
+    <div><div class="logo-name" style="font-size:20px">Baza ćwiczeń</div><div class="logo-sub">120+ ćwiczeń · YouTube</div></div>
+    <button class="btn btn-ghost btn-sm" onclick="openModal('modal-add-ex')">+ Własne</button>
   </div>
   <div class="filter-bar" id="muscle-filter"></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
@@ -288,9 +329,9 @@ canvas{width:100%;height:100%}
 
 <!-- PLANY -->
 <div class="page" id="page-plans">
-  <div class="logo-header" style="margin-bottom:12px">
-    <div><div class="logo-name" style="font-size:22px">Plany</div><div class="logo-sub">Konfigurator treningów</div></div>
-    <button class="btn btn-ghost btn-sm" onclick="addNewPlan()">+ Nowy plan</button>
+  <div class="logo-header" style="margin-bottom:10px">
+    <div><div class="logo-name" style="font-size:20px">Plany</div><div class="logo-sub">Konfigurator treningów</div></div>
+    <button class="btn btn-ghost btn-sm" onclick="addNewPlan()">+ Nowy</button>
   </div>
   <div id="plan-days-list"></div>
 </div>
@@ -299,7 +340,7 @@ canvas{width:100%;height:100%}
 
 <!-- REST OVERLAY -->
 <div class="rest-overlay" id="rest-overlay">
-  <div class="rest-title">ODPOCZYNEK</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--muted)">ODPOCZYNEK</div>
   <div class="timer-ring">
     <svg width="160" height="160" viewBox="0 0 160 160">
       <circle cx="80" cy="80" r="68" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
@@ -308,93 +349,82 @@ canvas{width:100%;height:100%}
     <div class="timer-center"><div class="timer-num" id="rest-num">90</div><div class="timer-label">sekund</div></div>
   </div>
   <div style="font-size:14px;color:var(--muted);text-align:center;padding:0 30px" id="rest-next"></div>
-  <button class="btn btn-primary" style="width:200px" onclick="skipRest()">Pomiń odpoczynek</button>
-  <div style="font-size:13px;color:var(--muted);cursor:pointer;text-decoration:underline;margin-top:4px" onclick="skipRest()">pomiń</div>
+  <button class="btn btn-primary" style="width:200px" onclick="skipRest()">Pomiń</button>
 </div>
 
-<!-- MODAL: workout detail -->
+<!-- MODALS -->
 <div class="modal-bg" id="modal-detail">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modal-detail-title">Szczegóły treningu</div>
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-title" id="modal-detail-title">Szczegóły</div>
     <div id="modal-detail-body"></div>
     <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="closeModal('modal-detail')">Zamknij</button>
   </div>
 </div>
 
-<!-- MODAL: add exercise to DB -->
 <div class="modal-bg" id="modal-add-ex">
-  <div class="modal">
-    <div class="modal-handle"></div>
+  <div class="modal"><div class="modal-handle"></div>
     <div class="modal-title">Dodaj własne ćwiczenie</div>
     <div style="display:flex;flex-direction:column;gap:10px">
-      <div><label>Nazwa ćwiczenia</label><input type="text" id="ae-name" placeholder="np. Wyciskanie hantli"/></div>
-      <div><label>Partia mięśniowa</label>
-        <select id="ae-muscle"><option value="klatka">Klatka piersiowa</option><option value="plecy">Plecy</option><option value="barki">Barki</option><option value="biceps">Biceps</option><option value="triceps">Triceps</option><option value="core">Core / Brzuch</option><option value="nogi">Nogi</option></select>
-      </div>
-      <div><label>Sprzęt</label>
-        <select id="ae-equip"><option value="maszyna">Maszyna</option><option value="kabel">Kable / Wyciąg</option><option value="wolne">Wolne ciężary</option><option value="własne">Własne ciało / Mata</option></select>
-      </div>
+      <div><label>Nazwa</label><input type="text" id="ae-name" placeholder="np. Wyciskanie hantli"/></div>
+      <div><label>Partia</label><select id="ae-muscle"><option value="klatka">Klatka</option><option value="plecy">Plecy</option><option value="barki">Barki</option><option value="biceps">Biceps</option><option value="triceps">Triceps</option><option value="core">Core/Brzuch</option><option value="nogi">Nogi</option></select></div>
+      <div><label>Sprzęt</label><select id="ae-equip"><option value="maszyna">Maszyna</option><option value="kabel">Kabel</option><option value="wolne">Wolne ciężary</option><option value="własne">Własne ciało</option></select></div>
       <div style="display:flex;gap:8px">
         <div style="flex:1"><label>Serie</label><input type="number" id="ae-sets" value="3" min="1" max="10"/></div>
-        <div style="flex:1"><label>Powtórzenia</label><input type="text" id="ae-reps" placeholder="10–12"/></div>
+        <div style="flex:1"><label>Powt.</label><input type="text" id="ae-reps" placeholder="10–12"/></div>
       </div>
-      <div><label>Link YouTube (opcjonalnie)</label><input type="url" id="ae-yt" placeholder="https://youtube.com/..."/></div>
-      <div><label>Uwagi / technika</label><textarea rows="2" id="ae-note" placeholder="Wskazówki techniczne..."></textarea></div>
+      <div><label>YouTube (opcja)</label><input type="url" id="ae-yt" placeholder="https://youtube.com/..."/></div>
+      <div><label>Uwagi</label><textarea rows="2" id="ae-note" placeholder="Wskazówki techniczne..."></textarea></div>
       <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:var(--rs)">
-        <input type="checkbox" id="ae-shoulder" style="width:18px;height:18px;flex-shrink:0;cursor:pointer">
-        <label for="ae-shoulder" style="margin:0;font-size:13px;color:var(--text);cursor:pointer">🟢 Bezpieczne dla barków</label>
+        <input type="checkbox" id="ae-shoulder" style="width:18px;height:18px;flex-shrink:0">
+        <label for="ae-shoulder" style="margin:0;font-size:13px;color:var(--text)">🟢 Bezpieczne dla barków</label>
       </div>
-      <button class="btn btn-primary" onclick="saveNewExercise()">Zapisz ćwiczenie</button>
+      <button class="btn btn-primary" onclick="saveNewExercise()">Zapisz</button>
     </div>
     <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="closeModal('modal-add-ex')">Anuluj</button>
   </div>
 </div>
 
-<!-- MODAL: add to plan -->
 <div class="modal-bg" id="modal-atp">
-  <div class="modal">
-    <div class="modal-handle"></div>
+  <div class="modal"><div class="modal-handle"></div>
     <div class="modal-title" id="modal-atp-title">Dodaj do planu</div>
     <div style="display:flex;flex-direction:column;gap:10px">
-      <div><label>Wybierz plan (numer treningu)</label><select id="atp-day"></select></div>
+      <div><label>Plan</label><select id="atp-day"></select></div>
       <div style="display:flex;gap:8px">
-        <div style="flex:1"><label>Serie</label><input type="number" id="atp-sets" value="3" min="1" max="10"/></div>
-        <div style="flex:1"><label>Powtórzenia</label><input type="text" id="atp-reps" placeholder="10–12"/></div>
+        <div style="flex:1"><label>Serie</label><input type="number" id="atp-sets" value="3"/></div>
+        <div style="flex:1"><label>Powt.</label><input type="text" id="atp-reps" placeholder="10–12"/></div>
       </div>
-      <button class="btn btn-primary" onclick="confirmATP()">Dodaj do planu</button>
+      <button class="btn btn-primary" onclick="confirmATP()">Dodaj</button>
     </div>
     <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="closeModal('modal-atp')">Anuluj</button>
   </div>
 </div>
 
-<!-- MODAL: settings -->
 <div class="modal-bg" id="modal-settings">
-  <div class="modal">
-    <div class="modal-handle"></div>
+  <div class="modal"><div class="modal-handle"></div>
     <div class="modal-title">Ustawienia</div>
-    <div class="sec-title" style="font-size:15px"><span></span>Czas odpoczynku (sek)</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+    <div class="sec-title" style="font-size:15px"><span></span>Czas odpoczynku</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
       <input type="number" id="rest-time" value="90" min="10" max="300" style="width:90px;text-align:center;font-size:20px;font-weight:600;font-family:'Bebas Neue',sans-serif">
-      <div style="font-size:13px;color:var(--muted);line-height:1.5">Domyślny odpoczynek między seriami.<br>Superserie → 30 sek.</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5">sekund między seriami</div>
     </div>
     <div class="divider"></div>
-    <div class="sec-title" style="font-size:15px"><span></span>Dane</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    <div class="sec-title" style="font-size:15px"><span></span>Konto</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px" id="settings-email">–</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn btn-ghost btn-sm" onclick="exportData()">Eksportuj JSON</button>
-      <button class="btn btn-danger btn-sm" onclick="clearData()">Wyczyść dane</button>
+      <button class="btn btn-danger btn-sm" onclick="doLogout()">Wyloguj</button>
     </div>
     <div class="divider"></div>
-    <div style="text-align:center;padding:12px 0 4px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);letter-spacing:2px">DZIKUS GYM</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">Patryk Kuczer · v2.0 · 2026</div>
+    <div style="text-align:center;padding:10px 0 4px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);letter-spacing:2px">DZIKUS GYM v2.1</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Patryk Kuczer · Firebase Cloud · 2026</div>
     </div>
-    <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="closeModal('modal-settings')">Zamknij</button>
+    <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="closeModal('modal-settings')">Zamknij</button>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
+<!-- NAV -->
+<nav class="bottom-nav" id="bottom-nav" style="display:none">
   <button class="nav-btn active" id="nav-home" onclick="showPage('page-home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Start
   </button>
@@ -414,212 +444,320 @@ canvas{width:100%;height:100%}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Opcje
   </button>
 </nav>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, orderBy, query, onSnapshot, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCJhpI2FdoW-pWTkn4vkVCCUHjsKWVFAEc",
+  authDomain: "dzikus-gym.firebaseapp.com",
+  projectId: "dzikus-gym",
+  storageBucket: "dzikus-gym.firebasestorage.app",
+  messagingSenderId: "811504163227",
+  appId: "1:811504163227:web:96514037ec034a1390693e"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+// ── EXPOSE TO WINDOW ──
+window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, doc, setDoc, getDoc, collection, addDoc, getDocs, orderBy, query, onSnapshot, deleteDoc };
+
+// ── AUTH STATE ──
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    window._currentUser = user;
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('main-app').style.display = 'block';
+    document.getElementById('bottom-nav').style.display = 'flex';
+    document.getElementById('settings-email').textContent = user.email;
+    document.getElementById('sync-user').textContent = user.email;
+    await window.loadUserData(user.uid);
+    window.renderHome();
+    window.setSyncStatus('synced', 'Zsynchronizowano');
+  } else {
+    window._currentUser = null;
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('bottom-nav').style.display = 'none';
+  }
+});
+
+// ── SAVE / LOAD ──
+window.saveWorkoutToCloud = async (workout) => {
+  if (!window._currentUser) return;
+  window.setSyncStatus('syncing', 'Zapisywanie...');
+  try {
+    const { db, doc, setDoc } = window._fb;
+    await setDoc(doc(db, 'users', window._currentUser.uid, 'workouts', String(workout.id)), workout);
+    window.setSyncStatus('synced', 'Zsynchronizowano');
+  } catch(e) { window.setSyncStatus('error', 'Błąd zapisu'); console.error(e); }
+};
+
+window.savePlanToCloud = async (plan) => {
+  if (!window._currentUser) return;
+  try {
+    const { db, doc, setDoc } = window._fb;
+    await setDoc(doc(db, 'users', window._currentUser.uid, 'config', 'plan'), { data: JSON.stringify(plan) });
+  } catch(e) { console.error(e); }
+};
+
+window.saveExDBToCloud = async (exdb) => {
+  if (!window._currentUser) return;
+  try {
+    const { db, doc, setDoc } = window._fb;
+    await setDoc(doc(db, 'users', window._currentUser.uid, 'config', 'exdb'), { data: JSON.stringify(exdb) });
+  } catch(e) { console.error(e); }
+};
+
+window.loadUserData = async (uid) => {
+  window.setSyncStatus('syncing', 'Pobieranie danych...');
+  try {
+    const { db, doc, getDoc, collection, getDocs, orderBy, query } = window._fb;
+    // Load plan
+    const planDoc = await getDoc(doc(db, 'users', uid, 'config', 'plan'));
+    if (planDoc.exists()) {
+      window.PLAN = JSON.parse(planDoc.data().data);
+    }
+    // Load custom exdb
+    const exDoc = await getDoc(doc(db, 'users', uid, 'config', 'exdb'));
+    if (exDoc.exists()) {
+      const cloudEx = JSON.parse(exDoc.data().data);
+      const customOnly = cloudEx.filter(e => e.custom);
+      customOnly.forEach(ce => { if (!window.EX_DB.find(e => e.id === ce.id)) window.EX_DB.push(ce); });
+    }
+    // Load workouts
+    const wSnap = await getDocs(query(collection(db, 'users', uid, 'workouts'), orderBy('date', 'asc')));
+    window.DB.workouts = [];
+    wSnap.forEach(d => window.DB.workouts.push(d.data()));
+    window.setSyncStatus('synced', 'Zsynchronizowano');
+  } catch(e) {
+    window.setSyncStatus('error', 'Błąd pobierania');
+    console.error(e);
+  }
+};
+</script>
+
 <script>
-// ══ EXERCISE DATABASE ══
+// ══ EXERCISE DATABASE (120+) ══
 const DEFAULT_EX_DB = [
-// ═══════════════════════════════
-// KLATKA PIERSIOWA (20)
-// ═══════════════════════════════
 {id:'bench_barbell',name:'Wyciskanie sztangi na ławce płaskiej',muscle:'klatka',equip:'wolne',sets:4,reps:'6–8',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=wyciskanie+sztangi+lawka+plaska+technika',note:'Klasyczne ćwiczenie masy. Łokcie 45–75° do tułowia, łopatki ściągnięte'},
-{id:'bench_dumbbell',name:'Wyciskanie hantli na ławce płaskiej',muscle:'klatka',equip:'wolne',sets:4,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=wyciskanie+hantli+lawka+plaska',note:'Większy zakres ruchu niż ze sztangą. Kontrolowane opuszczanie'},
-{id:'bench_incline_barbell',name:'Wyciskanie sztangi na ławce dodatniej',muscle:'klatka',equip:'wolne',sets:3,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=wyciskanie+sztangi+lawka+dodatnia',note:'Górna część klatki. Skok pod 30–45°, nie więcej'},
-{id:'bench_incline_dumbbell',name:'Wyciskanie hantli na ławce dodatniej',muscle:'klatka',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=incline+dumbbell+bench+press',note:'Górna klatka. Chwytem neutralnym – bezpieczniejsze dla barku'},
-{id:'bench_decline',name:'Wyciskanie sztangi na ławce skośnej (głową w dół)',muscle:'klatka',equip:'wolne',sets:3,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=decline+barbell+bench+press',note:'Dolna część klatki. Rzadko potrzebne, zastąp dipami'},
-{id:'chest_machine_press',name:'Wyciskanie klatki (maszyna)',muscle:'klatka',equip:'maszyna',sets:4,reps:'8–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=chest+press+machine+technique',note:'Łokcie ~45° do tułowia. Bezpieczniejsze niż sztanga przy problemach z barkiem'},
-{id:'chest_hammer',name:'Wyciskanie na maszynie Hammer',muscle:'klatka',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=hammer+strength+chest+press',note:'Dobra izolacja, naturalny tor ruchu. Polecane przy ostrożności z barkiem'},
-{id:'incline_machine',name:'Wyciskanie pod skosem (maszyna)',muscle:'klatka',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=incline+chest+press+machine',note:'Górna część klatki. Bezpieczniejszy zakres ruchu'},
-{id:'pec_deck',name:'Rozpiętki – maszyna butterfly (Pec Deck)',muscle:'klatka',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=pec+deck+butterfly+technika',note:'Izolacja klatki. Zmniejsz zakres przy bólu barku. Nie zginaj łokci'},
-{id:'cable_crossover',name:'Rozpiętki na wyciągu (Cable crossover)',muscle:'klatka',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+crossover+chest+technika',note:'Stały opór przez cały ruch. Wariant z wyciągu dolnego – górna klatka'},
-{id:'cable_fly_low',name:'Rozpiętki z wyciągu dolnego',muscle:'klatka',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=low+cable+chest+fly+technique',note:'Ruch do góry i do środka – angażuje górną klatkę i środek'},
-{id:'cable_chest_press',name:'Wyciskanie stojąc z wyciągu',muscle:'klatka',equip:'kabel',sets:3,reps:'12–15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+chest+press+standing',note:'Cable chest press. Dobra aktywacja przy problemach z leżeniem'},
-{id:'fly_dumbbell_flat',name:'Rozpiętki z hantlami na ławce płaskiej',muscle:'klatka',equip:'wolne',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dumbbell+chest+fly+flat+bench',note:'Lekkość i kontrola – NIE docelowe ćwiczenie siłowe. Ograniczony zakres'},
-{id:'fly_dumbbell_incline',name:'Rozpiętki z hantlami na ławce dodatniej',muscle:'klatka',equip:'wolne',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=incline+dumbbell+fly',note:'Górna klatka. Nie idź zbyt nisko – ryzyko kontuzji barku'},
-{id:'dips_chest',name:'Pompki na poręczach (wersja klatka)',muscle:'klatka',equip:'własne',sets:3,reps:'8–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dips+chest+version+technique',note:'Tułów pochylony do przodu, szerokie poręcze. Duże obciążenie barku!'},
-{id:'pushup_classic',name:'Pompki klasyczne',muscle:'klatka',equip:'własne',sets:3,reps:'12–20',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=pompki+poprawna+technika',note:'Ciało w linii prostej, łokcie 45° od tułowia. Progresja: nogi wyżej'},
-{id:'floor_press',name:'Wyciskanie hantli na podłodze (Floor press)',muscle:'klatka',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dumbbell+floor+press+technique',note:'Ograniczony zakres – naturalnie chroni bark. Dobry przy problemach ze stawem'},
-{id:'pullover',name:'Przenoszenie sztangielki za głowę (Pullover)',muscle:'klatka',equip:'wolne',sets:3,reps:'12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dumbbell+pullover+technique',note:'Angażuje klatkę i najszerszy. Ostrożnie przy problemach z barkiem'},
-{id:'pushup_wide',name:'Pompki z szerokim rozstawem',muscle:'klatka',equip:'własne',sets:3,reps:'15–20',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=wide+grip+push+ups',note:'Szerszy chwyt = więcej klatki, mniej tricepsa'},
-{id:'cable_fly_bench',name:'Rozpiętki z wyciągu na ławce',muscle:'klatka',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=bench+cable+chest+fly+technique',note:'Stały opór przez cały zakres ruchu. Łagodniejsze dla barku niż hantle'},
-
-// ═══════════════════════════════
-// PLECY (20)
-// ═══════════════════════════════
-{id:'lat_pulldown_wide',name:'Ściąganie drążka nachwytem (szerokie)',muscle:'plecy',equip:'kabel',sets:4,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lat+pulldown+wide+grip+technique',note:'Do klatki piersiowej, nie za głowę. Łopatki razem na końcu'},
-{id:'lat_pulldown_close',name:'Ściąganie drążka podchwytem wąsko',muscle:'plecy',equip:'kabel',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lat+pulldown+close+grip+underhand',note:'Bardziej angażuje dolną część najszerszego i biceps'},
-{id:'lat_pulldown_neutral',name:'Ściąganie chwytem neutralnym',muscle:'plecy',equip:'kabel',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lat+pulldown+neutral+grip',note:'Najłagodniejsze dla barku – polecane jako główny wariant'},
-{id:'pullup_overhand',name:'Podciąganie nachwytem',muscle:'plecy',equip:'własne',sets:4,reps:'6–10',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=pull+ups+overhand+technique',note:'Król ćwiczeń pleców. Pełen zakres – start z prostych ramion'},
-{id:'pullup_underhand',name:'Podciąganie podchwytem (Chin ups)',muscle:'plecy',equip:'własne',sets:4,reps:'6–10',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=chin+ups+technique',note:'Więcej bicepsa i dolnego najszerszego niż przy nachwycie'},
+{id:'bench_dumbbell',name:'Wyciskanie hantli na ławce płaskiej',muscle:'klatka',equip:'wolne',sets:4,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=wyciskanie+hantli+lawka+plaska',note:'Większy zakres ruchu niż ze sztangą'},
+{id:'bench_incline_barbell',name:'Wyciskanie sztangi na ławce dodatniej',muscle:'klatka',equip:'wolne',sets:3,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=wyciskanie+sztangi+lawka+dodatnia',note:'Górna część klatki. Skok pod 30–45°'},
+{id:'bench_incline_dumbbell',name:'Wyciskanie hantli na ławce dodatniej',muscle:'klatka',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=incline+dumbbell+bench+press',note:'Chwytem neutralnym – bezpieczniejsze dla barku'},
+{id:'chest_machine_press',name:'Wyciskanie klatki (maszyna)',muscle:'klatka',equip:'maszyna',sets:4,reps:'8–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=chest+press+machine+technique',note:'Łokcie ~45° do tułowia'},
+{id:'pec_deck',name:'Rozpiętki – maszyna butterfly (Pec Deck)',muscle:'klatka',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=pec+deck+butterfly+technika',note:'Izolacja klatki. Zmniejsz zakres przy bólu barku'},
+{id:'cable_crossover',name:'Rozpiętki na wyciągu (Cable crossover)',muscle:'klatka',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+crossover+chest+technika',note:'Stały opór przez cały ruch'},
+{id:'cable_fly_low',name:'Rozpiętki z wyciągu dolnego',muscle:'klatka',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=low+cable+chest+fly+technique',note:'Ruch do góry i do środka – górna klatka'},
+{id:'cable_chest_press',name:'Wyciskanie stojąc z wyciągu',muscle:'klatka',equip:'kabel',sets:3,reps:'12–15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+chest+press+standing',note:'Dobry przy problemach z leżeniem'},
+{id:'floor_press',name:'Wyciskanie hantli na podłodze (Floor press)',muscle:'klatka',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dumbbell+floor+press+technique',note:'Ograniczony zakres – naturalnie chroni bark'},
+{id:'fly_dumbbell_flat',name:'Rozpiętki z hantlami na ławce płaskiej',muscle:'klatka',equip:'wolne',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dumbbell+chest+fly+flat+bench',note:'Lekki ciężar i kontrola – nie siłowe'},
+{id:'dips_chest',name:'Pompki na poręczach (wersja klatka)',muscle:'klatka',equip:'własne',sets:3,reps:'8–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dips+chest+version+technique',note:'Tułów pochylony do przodu. Duże obciążenie barku!'},
+{id:'pushup_classic',name:'Pompki klasyczne',muscle:'klatka',equip:'własne',sets:3,reps:'12–20',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=pompki+poprawna+technika',note:'Ciało w linii prostej, łokcie 45° od tułowia'},
+{id:'pullover',name:'Przenoszenie sztangielki za głowę (Pullover)',muscle:'klatka',equip:'wolne',sets:3,reps:'12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dumbbell+pullover+technique',note:'Angażuje klatkę i najszerszy. Ostrożnie przy barku'},
+{id:'bench_decline',name:'Wyciskanie na ławce skośnej głową w dół',muscle:'klatka',equip:'wolne',sets:3,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=decline+barbell+bench+press',note:'Dolna część klatki'},
+// PLECY
+{id:'lat_pulldown_wide',name:'Ściąganie drążka nachwytem (szerokie)',muscle:'plecy',equip:'kabel',sets:4,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lat+pulldown+wide+grip+technique',note:'Do klatki piersiowej, nie za głowę'},
+{id:'lat_pulldown_close',name:'Ściąganie drążka podchwytem wąsko',muscle:'plecy',equip:'kabel',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lat+pulldown+close+grip+underhand',note:'Bardziej angażuje dolną część najszerszego'},
+{id:'lat_pulldown_neutral',name:'Ściąganie chwytem neutralnym',muscle:'plecy',equip:'kabel',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lat+pulldown+neutral+grip',note:'Najłagodniejsze dla barku – polecany wariant główny'},
+{id:'pullup_overhand',name:'Podciąganie nachwytem (Pull-ups)',muscle:'plecy',equip:'własne',sets:4,reps:'6–10',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=pull+ups+overhand+technique',note:'Pełen zakres – start z prostych ramion'},
+{id:'pullup_underhand',name:'Podciąganie podchwytem (Chin-ups)',muscle:'plecy',equip:'własne',sets:4,reps:'6–10',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=chin+ups+technique',note:'Więcej bicepsa i dolnego najszerszego'},
 {id:'pullup_neutral',name:'Podciąganie chwytem młotkowym',muscle:'plecy',equip:'własne',sets:3,reps:'6–10',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=neutral+grip+pull+ups+technique',note:'Najłagodniejszy dla barku wariant podciągania'},
-{id:'seated_row_cable',name:'Wiosłowanie siedząc na wyciągu',muscle:'plecy',equip:'kabel',sets:4,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=seated+cable+row+technique',note:'Łopatki razem na końcu ruchu, klatka wypięta. Nie zaokrąglaj pleców'},
-{id:'seated_row_machine',name:'Wiosłowanie siedząc (maszyna)',muscle:'plecy',equip:'maszyna',sets:4,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=seated+row+machine+technique',note:'Stabilna maszyna – łatwiej utrzymać technikę'},
-{id:'chest_supported_row',name:'Wiosłowanie w oparciu o ławkę (chest pad)',muscle:'plecy',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=chest+supported+row+technique',note:'Zero kompensacji kręgosłupem. Polecane przy bólach dolnego odcinka'},
-{id:'barbell_row_overhand',name:'Wiosłowanie sztangą nachwytem',muscle:'plecy',equip:'wolne',sets:4,reps:'6–8',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=bent+over+barbell+row+technique',note:'Ciężkie wiosłowanie. Plecy proste lub lekko zaokrąglone – nie garbij'},
-{id:'pendlay_row',name:'Wiosło Pendlaya',muscle:'plecy',equip:'wolne',sets:4,reps:'5–6',tempo:'1-0-1',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=pendlay+row+technique',note:'Pełen opad tułowia, sztanga z podłogi. Eksplozywne przyciąganie'},
-{id:'dumbbell_row_knee',name:'Wiosłowanie hantlą w klęku podpartym',muscle:'plecy',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dumbbell+row+knee+supported',note:'Kolano i ręka na ławce. Pełny zakres ruchu, rotacja łopatki'},
-{id:'dumbbell_row_chest',name:'Wiosłowanie hantlami w oparciu o ławkę skośną',muscle:'plecy',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dumbbells+row+chest+supported+incline',note:'Klatka na ławce – eliminuje kompensację'},
-{id:'landmine_row',name:'Wiosłowanie półsztangą (Landmine row)',muscle:'plecy',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=landmine+row+technique',note:'Naturalny łuk ruchu – przyjazny dla kręgosłupa i barku'},
-{id:'cable_pullover',name:'Prostopadłe ściąganie drążka do bioder (Cable pullover)',muscle:'plecy',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+pullover+technique',note:'Izoluje najszerszy bez angażowania bicepsa. Straight-arm pulldown'},
-{id:'straight_arm_pulldown',name:'Ściąganie ramion w dół (Straight arm)',muscle:'plecy',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=straight+arm+pulldown+technique',note:'Ramiona proste przez cały ruch. Czujesz tylko najszerszy'},
-{id:'facepull',name:'Facepull (przyciąganie liny do twarzy)',muscle:'plecy',equip:'kabel',sets:4,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=face+pull+technique+shoulder+health',note:'OBOWIĄZKOWE na każdym treningu pleców i barków. Tylna głowa + rotatory'},
-{id:'deadlift',name:'Klasyczny martwy ciąg',muscle:'plecy',equip:'wolne',sets:4,reps:'4–6',tempo:'2-0-1',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=martwy+ciag+technika+krok+po+kroku',note:'Król ćwiczeń. Plecy proste, bar blisko ciała. Wymaga dobrej techniki'},
-{id:'hyperextension',name:'Unoszenie tułowia (Hyperextension)',muscle:'plecy',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hyperextension+technique+back',note:'Prostownik grzbietu. Nie przeprostowuj na górze – ryzyko lędźwi'},
-{id:'inverted_row',name:'Wiosłowanie odwrotne (Inverted row / TRX row)',muscle:'plecy',equip:'własne',sets:3,reps:'10–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=inverted+row+technique',note:'Ciało w linii prostej. Utrudnij: nogi wyżej lub wolniejsze tempo'},
-
-// ═══════════════════════════════
-// BARKI (20)
-// ═══════════════════════════════
-{id:'ohp_barbell',name:'Wyciskanie sztangi nad głowę (Military press)',muscle:'barki',equip:'wolne',sets:4,reps:'6–8',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=military+press+overhead+press+technique',note:'Stojąc lub siedząc. Aktywne nogi, napięty brzuch. UWAGA na barki'},
-{id:'ohp_dumbbell_seated',name:'Wyciskanie hantli nad głowę siedząc',muscle:'barki',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=seated+dumbbell+shoulder+press+technique',note:'Oparcie pod 80–90°. Hantle na wysokości ucha, nie niżej'},
-{id:'ohp_dumbbell_standing',name:'Wyciskanie hantli nad głowę stojąc',muscle:'barki',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=standing+dumbbell+shoulder+press',note:'Wymaga stabilizacji core. Trudniejsza wersja niż siedząc'},
-{id:'ohp_machine',name:'Wyciskanie nad głowę na maszynie',muscle:'barki',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=machine+shoulder+press+technique',note:'Prowadzony tor – dobry jako ćwiczenie uzupełniające'},
-{id:'arnold_press',name:'Arnoldki – wyciskanie z rotacją',muscle:'barki',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=arnold+press+technique',note:'Rotacja w trakcie wyciskania – angażuje wszystkie 3 głowy barku'},
-{id:'lateral_raise_dumbbell',name:'Unoszenie ramion w bok (hantle)',muscle:'barki',equip:'wolne',sets:4,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lateral+raise+dumbbell+technique',note:'Lekki ciężar, nie powyżej 90°. Kciuk lekko w dół lub poziomo'},
-{id:'lateral_raise_machine',name:'Unoszenie w bok (maszyna)',muscle:'barki',equip:'maszyna',sets:4,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lateral+raise+machine+technique',note:'Stały opór. Lepsza izolacja niż z hantlami przy zmęczeniu'},
-{id:'lateral_raise_cable',name:'Unoszenie ramienia w bok (wyciąg dolny)',muscle:'barki',equip:'kabel',sets:3,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+lateral+raise+technique',note:'Stały opór przez cały ruch – lepsza aktywacja niż z hantlami'},
-{id:'front_raise_dumbbell',name:'Unoszenie ramion w przód (hantle)',muscle:'barki',equip:'wolne',sets:3,reps:'12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=front+raise+dumbbell+technique',note:'Przednia głowa barku. Naprzemiennie lub razem – do poziomu barku'},
-{id:'front_raise_cable',name:'Unoszenie ramion w przód (wyciąg)',muscle:'barki',equip:'kabel',sets:3,reps:'12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=cable+front+raise+technique',note:'Równomierne obciążenie przez cały zakres'},
-{id:'rear_delt_fly',name:'Wznosy w opadzie tułowia (Rear delt fly)',muscle:'barki',equip:'wolne',sets:4,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=bent+over+rear+delt+fly+technique',note:'Tylna głowa barku. W opadzie tułowia lub opierając czoło o ławkę'},
-{id:'rear_delt_cable',name:'Odwodzenie linek w tył (Cable rear delt fly)',muscle:'barki',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+rear+delt+fly+technique',note:'Linki skrzyżowane lub osobno. Stały opór = lepsza izolacja'},
-{id:'facepull_rotation',name:'Facepull z rotacją zewnętrzną',muscle:'barki',equip:'kabel',sets:4,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=face+pull+external+rotation+technique',note:'Rotacja na zewnątrz na końcu. Kluczowe dla zdrowia stożka rotatorów'},
-{id:'upright_row',name:'Podciąganie sztangi pod brodę',muscle:'barki',equip:'wolne',sets:3,reps:'12',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=upright+barbell+row+technique',note:'OSTROŻNIE – potencjalne impingement. Nie wyżej niż do brody, szeroki chwyt'},
-{id:'shrugs_dumbbell',name:'Szrugi z hantlami',muscle:'barki',equip:'wolne',sets:3,reps:'15',tempo:'2-2-1',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dumbbell+shrugs+technique',note:'Czworoboczny górny. Pauza na górze, nie obracaj ramionami'},
-{id:'shrugs_machine',name:'Szrugi (maszyna)',muscle:'barki',equip:'maszyna',sets:3,reps:'15',tempo:'2-2-1',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=machine+shrugs+technique',note:'Bezpieczniejsze niż ze sztangą. Pauza na górze'},
-{id:'ext_rotation_cable',name:'Rotacja zewnętrzna barku (wyciąg)',muscle:'barki',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=external+rotation+shoulder+cable+rehab',note:'PROFILAKTYKA – rotatory stożka. Łokieć przy boku, małe obciążenie'},
-{id:'ext_rotation_lying',name:'Rotacja zewnętrzna w leżeniu bokiem',muscle:'barki',equip:'wolne',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=external+rotation+lying+side+dumbbell',note:'Najlepsza izolacja rotatorów. Obowiązkowe przy historii kontuzji barku'},
-{id:'landmine_press_shoulder',name:'Landmine press (na barki)',muscle:'barki',equip:'wolne',sets:3,reps:'10/strona',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=landmine+press+shoulder+technique',note:'Ukośny tor – mniej stresu niż OHP pionowy. Wariant klęczący lub stojąc'},
-{id:'cuban_press',name:'Cuban press',muscle:'barki',equip:'wolne',sets:3,reps:'12',tempo:'3-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cuban+press+technique+rotator+cuff',note:'Łączy wznosy + rotacje + wyciskanie. Dobry do rozgrzewki i profilaktyki'},
-
-// ═══════════════════════════════
-// BICEPS (15)
-// ═══════════════════════════════
-{id:'barbell_curl',name:'Uginanie ramion ze sztangą',muscle:'biceps',equip:'wolne',sets:4,reps:'8–10',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=barbell+curl+technika+biceps',note:'Klasyczne. Łokcie przy tułowiu, nie huśtaj. Wolne opuszczanie 3 sek'},
-{id:'dumbbell_curl_supinated',name:'Uginanie hantli z rotacją (Supinated curl)',muscle:'biceps',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dumbbell+curl+supination+rotation',note:'Rotacja w górnej fazie ruchu – pełna aktywacja bicepsa'},
-{id:'hammer_curl',name:'Hammer curl (uginanie hantlem – kciuk góra)',muscle:'biceps',equip:'wolne',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hammer+curl+technique',note:'Kciuk do góry – angażuje brachialis. Ochrona ścięgna bicepsa'},
-{id:'hammer_curl_cable',name:'Hammer curl na wyciągu dolnym',muscle:'biceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hammer+curl+cable+rope',note:'Stały opór przez cały ruch. Lina lub uchwyt V-bar'},
-{id:'preacher_curl',name:'Uginanie na modlitewniku (Preacher curl)',muscle:'biceps',equip:'maszyna',sets:3,reps:'12',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=preacher+curl+machine+technique',note:'Łokieć na poduszce – pełna izolacja. Pauza 1 sek na górze'},
-{id:'preacher_curl_barbell',name:'Uginanie na modlitewniku ze sztangą',muscle:'biceps',equip:'wolne',sets:3,reps:'8–10',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=barbell+preacher+curl+technique',note:'Większy zakres siły niż maszyna. Pilnuj ustawienia łokcia'},
-{id:'concentration_curl',name:'Uginanie koncentryczne (Concentration curl)',muscle:'biceps',equip:'wolne',sets:3,reps:'12',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=concentration+curl+technique',note:'Łokieć oparty o udo. Maksymalna izolacja głowy długiej'},
-{id:'incline_curl',name:'Uginanie na ławce skośnej (Incline curl)',muscle:'biceps',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=incline+dumbbell+curl+technique',note:'Pełen rozciąg bicepsa. Bardzo efektywne – lekki ciężar wystarczy'},
-{id:'cable_curl',name:'Uginanie na wyciągu dolnym',muscle:'biceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+bicep+curl+technique',note:'Stały opór. Dobry finisher lub przy przepracowanych barkach'},
-{id:'reverse_curl',name:'Uginanie odwrotnym chwytem',muscle:'biceps',equip:'wolne',sets:3,reps:'12',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=reverse+curl+forearm+biceps',note:'Angażuje brachioradialis i prostowniki nadgarstka. Wzmacnia przedramię'},
-{id:'zottman_curl',name:'Zottman curl',muscle:'biceps',equip:'wolne',sets:3,reps:'10–12',tempo:'3-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=zottman+curl+technique',note:'Rotacja w górze ruchu + opuszczanie odwrotnym chwytem. Kompleksowe'},
-{id:'bayesian_curl',name:'Bayesian curl (wyciąg za plecami)',muscle:'biceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=bayesian+curl+cable+technique',note:'Maksymalny rozciąg bicepsa w dolnej fazie. Wysoka aktywacja EMG'},
-{id:'spider_curl',name:'Spider curl',muscle:'biceps',equip:'wolne',sets:3,reps:'12',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=spider+curl+bench+technique',note:'Klatka na ławce skośnej. Stała praca bicepsa bez odciążenia'},
-{id:'curl_21s',name:'Uginanie „21" (curl 21s)',muscle:'biceps',equip:'wolne',sets:3,reps:'21',tempo:'—',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=21s+bicep+curl+technique',note:'7 dolnych + 7 górnych + 7 pełnych powtórzeń. Technika intensyfikacji'},
-{id:'cross_body_curl',name:'Uginanie przez klatkę (Cross-body curl)',muscle:'biceps',equip:'wolne',sets:3,reps:'12/str',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cross+body+curl+brachialis',note:'Ukośny ruch do klatki – izoluje brachialis i krótką głowę'},
-
-// ═══════════════════════════════
-// TRICEPS (15)
-// ═══════════════════════════════
-{id:'tricep_pushdown_vbar',name:'Prostowanie ramion na wyciągu (V-bar)',muscle:'triceps',equip:'kabel',sets:4,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+pushdown+vbar+technique',note:'Łokcie przy tułowiu przez cały ruch. Kontrolowane opuszczanie'},
-{id:'tricep_pushdown_rope',name:'Prostowanie ramion na wyciągu (lina)',muscle:'triceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+pushdown+rope+technique',note:'Rozwarcie liny na dole – pełna aktywacja bocznej głowy'},
-{id:'tricep_overhead_cable',name:'Prostowanie nad głową na wyciągu',muscle:'triceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=overhead+tricep+extension+cable',note:'Długa głowa tricepsa – daje objętość ramienia. Łokcie przy głowie'},
-{id:'tricep_overhead_dumbbell',name:'Prostowanie nad głową z hantlem',muscle:'triceps',equip:'wolne',sets:3,reps:'12',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=overhead+tricep+extension+dumbbell',note:'Oburącz lub jednorącz. Łokcie blisko głowy, nie rozchylaj'},
-{id:'tricep_machine',name:'Prostowanie ramion (maszyna)',muscle:'triceps',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+extension+machine+technique',note:'Prowadzony tor – dobry jako dodatkowe ćwiczenie'},
-{id:'skull_crusher',name:'Łamacze czaszki (Skull crushers)',muscle:'triceps',equip:'wolne',sets:4,reps:'10–12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=skull+crushers+technique+triceps',note:'EZ-bar lub hantle. Łokcie skierowane w górę, nie rozchylaj na boki'},
-{id:'close_grip_bench',name:'Wyciskanie wąskim chwytem',muscle:'triceps',equip:'wolne',sets:3,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=close+grip+bench+press+triceps',note:'Chwyt na szerokość barków lub nieco wężej. Nie zbyt wąsko – ryzyko nadgarstka'},
-{id:'dips_triceps',name:'Pompki na poręczach (wersja triceps)',muscle:'triceps',equip:'własne',sets:3,reps:'10–15',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=tricep+dips+bars+technique',note:'Tułów pionowy, wąskie poręcze. UWAGA – duże obciążenie barku!'},
-{id:'dips_bench',name:'Pompki między ławkami',muscle:'triceps',equip:'własne',sets:3,reps:'12–15',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=bench+dips+triceps+technique',note:'Łatwiejsza wersja. Nogi proste lub ugięte. Nie schodź zbyt nisko'},
-{id:'kickback',name:'Odpychanie hantla w tył (Kickback)',muscle:'triceps',equip:'wolne',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+kickback+dumbbell+technique',note:'Ramię równolegle do podłogi przez cały ruch. Pauza na górze'},
-{id:'kickback_cable',name:'Odpychanie w tył na wyciągu',muscle:'triceps',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+kickback+cable+technique',note:'Stały opór. Lepsza wersja niż z hantlem'},
-{id:'pushdown_reverse',name:'Prostowanie odwrotnym chwytem',muscle:'triceps',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=reverse+grip+tricep+pushdown',note:'Angażuje bardziej długą głowę i przyśrodkową. Dobry wariant'},
-{id:'overhead_barbell',name:'Wyciskanie sztangi zza głowy (French press)',muscle:'triceps',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=french+press+barbell+triceps',note:'Długa głowa. EZ-bar bezpieczniejszy dla nadgarstków niż sztanga prosta'},
-{id:'diamond_pushup',name:'Pompki w diament',muscle:'triceps',equip:'własne',sets:3,reps:'12–15',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=diamond+push+ups+triceps+technique',note:'Dłonie w kształt rombu. Bardzo dobra aktywacja tricepsa bez sprzętu'},
-{id:'jm_press',name:'JM Press',muscle:'triceps',equip:'wolne',sets:3,reps:'8–10',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=jm+press+triceps+powerlifting',note:'Hybryda skull crushera i wyciskania wąskiego. Ciężki i efektywny'},
-
-// ═══════════════════════════════
-// CORE / BRZUCH (15)
-// ═══════════════════════════════
-{id:'landmine_anti',name:'Landmine anti-rotation',muscle:'core',equip:'wolne',sets:3,reps:'8/strona',tempo:'3-0-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=landmine+anti+rotation+core',note:'Powolny łuk z boku na bok, kręgosłup neutralny. Kontrola rotacyjna'},
-{id:'landmine_rainbow',name:'Landmine rainbow',muscle:'core',equip:'wolne',sets:3,reps:'10/strona',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=landmine+rainbow+core+exercise',note:'Dynamiczniejszy wariant – łuk nad głową z boku na bok'},
-{id:'hollow_body',name:'Hollow body hold',muscle:'core',equip:'własne',sets:3,reps:'20–30 sek',tempo:'—',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hollow+body+hold+technique',note:'Leżysz na plecach, ręce i nogi uniesione – napięcie całego core'},
-{id:'dead_bug',name:'Dead bug',muscle:'core',equip:'własne',sets:3,reps:'8/strona',tempo:'3-0-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dead+bug+exercise+technique',note:'Kontrolowane opuszczanie kończyn. Doskonałe dla stabilizacji'},
-{id:'plank',name:'Plank (deska)',muscle:'core',equip:'własne',sets:3,reps:'30–60 sek',tempo:'—',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=plank+perfect+form',note:'Biodra w linii z ramionami, brzuch napięty, nie uginaj lędźwi'},
-{id:'side_plank',name:'Plank boczny',muscle:'core',equip:'własne',sets:3,reps:'20–40 sek/str',tempo:'—',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=side+plank+technique',note:'Na przedramieniu jeśli bark wrażliwy. Stabilizacja boczna'},
-{id:'cable_crunch',name:'Spięcia brzucha na wyciągu',muscle:'core',equip:'kabel',sets:3,reps:'15–20',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+crunch+technique',note:'Ruch z bioder, nie z ramion. Kontroluj opuszczanie'},
-{id:'hanging_leg',name:'Unoszenie nóg w zwisie',muscle:'core',equip:'własne',sets:3,reps:'10–15',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=hanging+leg+raise+technique',note:'Świetny dla dolnego brzucha. Bez huśtania. Wersja z kolanami – łatwiej'},
-{id:'ab_wheel',name:'Wałek do brzucha (Ab wheel)',muscle:'core',equip:'własne',sets:3,reps:'8–12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=ab+wheel+rollout+technique',note:'Zaawansowane – tylko gdy core stabilny i bez bólu lędźwi'},
-{id:'russian_twist',name:'Skręty tułowia (Russian twist)',muscle:'core',equip:'wolne',sets:3,reps:'20',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=russian+twist+core+technique',note:'Nogi uniesione, ciężar lub bez. Kontrolowany ruch, nie machaj'},
-{id:'pallof_press',name:'Pallof press',muscle:'core',equip:'kabel',sets:3,reps:'10/strona',tempo:'3-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=pallof+press+anti+rotation+core',note:'Anti-rotation stabilizacja. Wyciąg na wysokości klatki, stały odpór'},
-{id:'leg_raise_lying',name:'Unoszenie nóg leżąc',muscle:'core',equip:'własne',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lying+leg+raise+technique+core',note:'Dolny brzuch. Nogi proste lub ugięte. Odcinek lędźwiowy przy podłodze'},
-{id:'ab_crunch',name:'Spięcia brzucha',muscle:'core',equip:'własne',sets:3,reps:'20',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=crunch+core+technique',note:'Tylko górna część ruchu – nie podciągaj głowy. Łokcie na bok'},
-{id:'bird_dog',name:'Bird dog',muscle:'core',equip:'własne',sets:3,reps:'10/strona',tempo:'3-0-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=bird+dog+exercise+spine+stability',note:'Na czworakach – naprzemienny ruch ręka-noga. Stabilizacja kręgosłupa'},
-{id:'woodchop',name:'Ścinanie drewna (Woodchop)',muscle:'core',equip:'kabel',sets:3,reps:'12/strona',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=cable+woodchop+core+rotational',note:'Rotacyjna siła core. Wariant w górę i w dół. Dobre do sportu'},
-
-// ═══════════════════════════════
-// NOGI (15)
-// ═══════════════════════════════
-{id:'squat_barbell',name:'Przysiad ze sztangą',muscle:'nogi',equip:'wolne',sets:4,reps:'5–8',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=przysiad+ze+sztanga+technika',note:'Król ćwiczeń nóg. Kolana nad palcami, klatka wypięta, głębokość do możliwości'},
-{id:'front_squat',name:'Przysiad ze sztangą z przodu',muscle:'nogi',equip:'wolne',sets:3,reps:'6–8',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=front+squat+technique',note:'Bardziej angażuje czworogłowy. Wymaga dobrej mobilności nadgarstków'},
-{id:'leg_press',name:'Leg Press',muscle:'nogi',equip:'maszyna',sets:4,reps:'10–15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=leg+press+technique+form',note:'Kolana nie przekraczają palców. Stopy różne ustawienia – zmienia akcent'},
-{id:'hack_squat',name:'Hack squat (maszyna)',muscle:'nogi',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hack+squat+machine+technique',note:'Duże obciążenie czworogłowego. Kolana w linii z palcami'},
-{id:'bulgarian_split',name:'Przysiad bułgarski',muscle:'nogi',equip:'wolne',sets:3,reps:'10/str',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=bulgarian+split+squat+technique',note:'Tylna noga na ławce. Trudne – testuj z małym ciężarem. UWAŻAJ na udo!'},
-{id:'leg_extension',name:'Prostowanie nóg (maszyna)',muscle:'nogi',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=leg+extension+machine+technique',note:'Izolacja czworogłowego. Pauza 1 sek na górze. Nie nadużywaj'},
-{id:'leg_curl_lying',name:'Uginanie nóg leżąc (maszyna)',muscle:'nogi',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lying+leg+curl+machine+technique',note:'Dwugłowy uda. Wolne opuszczanie – ekscentryczna faza kluczowa'},
+{id:'seated_row_cable',name:'Wiosłowanie siedząc na wyciągu',muscle:'plecy',equip:'kabel',sets:4,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=seated+cable+row+technique',note:'Łopatki razem na końcu, klatka wypięta'},
+{id:'seated_row_machine',name:'Wiosłowanie siedząc (maszyna)',muscle:'plecy',equip:'maszyna',sets:4,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=seated+row+machine+technique',note:'Prowadzony tor – łatwiej utrzymać technikę'},
+{id:'chest_supported_row',name:'Wiosłowanie w oparciu o ławkę (chest pad)',muscle:'plecy',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=chest+supported+row+technique',note:'Zero kompensacji kręgosłupem'},
+{id:'barbell_row',name:'Wiosłowanie sztangą nachwytem',muscle:'plecy',equip:'wolne',sets:4,reps:'6–8',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=bent+over+barbell+row+technique',note:'Ciężkie wiosłowanie. Plecy proste'},
+{id:'pendlay_row',name:'Wiosło Pendlaya',muscle:'plecy',equip:'wolne',sets:4,reps:'5–6',tempo:'1-0-1',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=pendlay+row+technique',note:'Pełen opad tułowia, sztanga z podłogi'},
+{id:'dumbbell_row_knee',name:'Wiosłowanie hantlą w klęku podpartym',muscle:'plecy',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dumbbell+row+knee+supported',note:'Kolano i ręka na ławce. Pełny zakres'},
+{id:'landmine_row',name:'Wiosłowanie półsztangą (Landmine row)',muscle:'plecy',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=landmine+row+technique',note:'Naturalny łuk – przyjazny dla kręgosłupa'},
+{id:'straight_arm',name:'Ściąganie ramion w dół (Straight arm)',muscle:'plecy',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=straight+arm+pulldown+technique',note:'Izoluje najszerszy bez angażowania bicepsa'},
+{id:'facepull',name:'Facepull (przyciąganie liny do twarzy)',muscle:'plecy',equip:'kabel',sets:4,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=face+pull+technique+shoulder+health',note:'OBOWIĄZKOWE – zdrowie barków. Tylna głowa + rotatory'},
+{id:'deadlift',name:'Klasyczny martwy ciąg',muscle:'plecy',equip:'wolne',sets:4,reps:'4–6',tempo:'2-0-1',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=martwy+ciag+technika',note:'Plecy proste, bar blisko ciała. Wymaga dobrej techniki'},
+{id:'hyperextension',name:'Unoszenie tułowia (Hyperextension)',muscle:'plecy',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hyperextension+technique+back',note:'Prostownik grzbietu. Nie przeprostowuj na górze'},
+{id:'inverted_row',name:'Wiosłowanie odwrotne (Inverted row)',muscle:'plecy',equip:'własne',sets:3,reps:'10–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=inverted+row+technique',note:'Ciało w linii prostej. Utrudnij: nogi wyżej'},
+// BARKI
+{id:'ohp_barbell',name:'Wyciskanie sztangi nad głowę (Military press)',muscle:'barki',equip:'wolne',sets:4,reps:'6–8',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=military+press+overhead+press+technique',note:'Aktywne nogi, napięty brzuch. UWAGA na barki'},
+{id:'ohp_dumbbell_seated',name:'Wyciskanie hantli nad głowę siedząc',muscle:'barki',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=seated+dumbbell+shoulder+press+technique',note:'Hantle na wysokości ucha, nie niżej'},
+{id:'ohp_machine',name:'Wyciskanie nad głowę (maszyna)',muscle:'barki',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=machine+shoulder+press+technique',note:'Prowadzony tor – dobry jako uzupełnienie'},
+{id:'arnold_press',name:'Arnoldki – wyciskanie z rotacją',muscle:'barki',equip:'wolne',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=arnold+press+technique',note:'Angażuje wszystkie 3 głowy barku'},
+{id:'lateral_raise_dumbbell',name:'Unoszenie ramion w bok (hantle)',muscle:'barki',equip:'wolne',sets:4,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lateral+raise+dumbbell+technique',note:'Lekki ciężar, nie powyżej 90°'},
+{id:'lateral_raise_machine',name:'Unoszenie w bok (maszyna)',muscle:'barki',equip:'maszyna',sets:4,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lateral+raise+machine+technique',note:'Stały opór. Lepsza izolacja przy zmęczeniu'},
+{id:'lateral_raise_cable',name:'Unoszenie ramienia w bok (wyciąg)',muscle:'barki',equip:'kabel',sets:3,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+lateral+raise+technique',note:'Stały opór przez cały ruch'},
+{id:'front_raise_dumbbell',name:'Unoszenie ramion w przód (hantle)',muscle:'barki',equip:'wolne',sets:3,reps:'12',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=front+raise+dumbbell+technique',note:'Przednia głowa barku – do poziomu barku'},
+{id:'rear_delt_fly',name:'Wznosy w opadzie tułowia (Rear delt fly)',muscle:'barki',equip:'wolne',sets:4,reps:'15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=bent+over+rear+delt+fly+technique',note:'Tylna głowa barku'},
+{id:'rear_delt_cable',name:'Odwodzenie linek w tył (Cable rear delt)',muscle:'barki',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+rear+delt+fly+technique',note:'Stały opór = lepsza izolacja tylnej głowy'},
+{id:'facepull_rotation',name:'Facepull z rotacją zewnętrzną',muscle:'barki',equip:'kabel',sets:4,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=face+pull+external+rotation+technique',note:'Kluczowe dla zdrowia stożka rotatorów'},
+{id:'shrugs_machine',name:'Szrugi (maszyna)',muscle:'barki',equip:'maszyna',sets:3,reps:'15',tempo:'2-2-1',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=machine+shrugs+technique',note:'Czworoboczny górny. Pauza na górze'},
+{id:'shrugs_dumbbell',name:'Szrugi z hantlami',muscle:'barki',equip:'wolne',sets:3,reps:'15',tempo:'2-2-1',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dumbbell+shrugs+technique',note:'Pauza na górze, nie obracaj ramionami'},
+{id:'ext_rotation_cable',name:'Rotacja zewnętrzna barku (wyciąg)',muscle:'barki',equip:'kabel',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=external+rotation+shoulder+cable+rehab',note:'PROFILAKTYKA – obowiązkowe. Łokieć przy boku'},
+{id:'ext_rotation_lying',name:'Rotacja zewnętrzna w leżeniu bokiem',muscle:'barki',equip:'wolne',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=external+rotation+lying+side+dumbbell',note:'Najlepsza izolacja rotatorów'},
+{id:'cuban_press',name:'Cuban press',muscle:'barki',equip:'wolne',sets:3,reps:'12',tempo:'3-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cuban+press+technique+rotator+cuff',note:'Dobry do rozgrzewki i profilaktyki barków'},
+// BICEPS
+{id:'barbell_curl',name:'Uginanie ramion ze sztangą',muscle:'biceps',equip:'wolne',sets:4,reps:'8–10',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=barbell+curl+technika+biceps',note:'Łokcie przy tułowiu, nie huśtaj. Wolne opuszczanie'},
+{id:'dumbbell_curl',name:'Uginanie hantli z rotacją',muscle:'biceps',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=dumbbell+curl+supination',note:'Rotacja w górnej fazie – pełna aktywacja'},
+{id:'hammer_curl',name:'Hammer curl (kciuk góra)',muscle:'biceps',equip:'wolne',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hammer+curl+technique',note:'Angażuje brachialis. Ochrona ścięgna bicepsa'},
+{id:'hammer_curl_cable',name:'Hammer curl na wyciągu',muscle:'biceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hammer+curl+cable+rope',note:'Stały opór przez cały ruch'},
+{id:'preacher_curl',name:'Uginanie na modlitewniku (maszyna)',muscle:'biceps',equip:'maszyna',sets:3,reps:'12',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=preacher+curl+machine+technique',note:'Pełna izolacja. Pauza 1 sek na górze'},
+{id:'preacher_curl_bar',name:'Uginanie na modlitewniku ze sztangą',muscle:'biceps',equip:'wolne',sets:3,reps:'8–10',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=barbell+preacher+curl+technique',note:'Większy zakres siły niż maszyna'},
+{id:'concentration_curl',name:'Uginanie koncentryczne',muscle:'biceps',equip:'wolne',sets:3,reps:'12',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=concentration+curl+technique',note:'Łokieć oparty o udo. Maksymalna izolacja'},
+{id:'incline_curl',name:'Uginanie na ławce skośnej',muscle:'biceps',equip:'wolne',sets:3,reps:'10–12',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=incline+dumbbell+curl+technique',note:'Pełen rozciąg bicepsa. Lekki ciężar wystarczy'},
+{id:'cable_curl',name:'Uginanie na wyciągu dolnym',muscle:'biceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+bicep+curl+technique',note:'Stały opór. Dobry finisher'},
+{id:'bayesian_curl',name:'Bayesian curl (wyciąg za plecami)',muscle:'biceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-3',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=bayesian+curl+cable+technique',note:'Maksymalny rozciąg bicepsa. Wysoka aktywacja EMG'},
+// TRICEPS
+{id:'tricep_pushdown_vbar',name:'Prostowanie ramion na wyciągu (V-bar)',muscle:'triceps',equip:'kabel',sets:4,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+pushdown+vbar+technique',note:'Łokcie przy tułowiu. Kontrolowane opuszczanie'},
+{id:'tricep_pushdown_rope',name:'Prostowanie ramion na wyciągu (lina)',muscle:'triceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+pushdown+rope+technique',note:'Rozwarcie liny na dole – pełna aktywacja'},
+{id:'tricep_overhead_cable',name:'Prostowanie nad głową na wyciągu',muscle:'triceps',equip:'kabel',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=overhead+tricep+extension+cable',note:'Długa głowa. Łokcie przy głowie'},
+{id:'tricep_overhead_dumbbell',name:'Prostowanie nad głową z hantlem',muscle:'triceps',equip:'wolne',sets:3,reps:'12',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=overhead+tricep+extension+dumbbell',note:'Łokcie blisko głowy, nie rozchylaj'},
+{id:'skull_crusher',name:'Łamacze czaszki (Skull crushers)',muscle:'triceps',equip:'wolne',sets:4,reps:'10–12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=skull+crushers+technique+triceps',note:'EZ-bar lub hantle. Łokcie skierowane w górę'},
+{id:'close_grip_bench',name:'Wyciskanie wąskim chwytem',muscle:'triceps',equip:'wolne',sets:3,reps:'8–10',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=close+grip+bench+press+triceps',note:'Chwyt na szerokość barków. Nie zbyt wąsko'},
+{id:'dips_triceps',name:'Pompki na poręczach (triceps)',muscle:'triceps',equip:'własne',sets:3,reps:'10–15',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=tricep+dips+bars+technique',note:'Tułów pionowy. UWAGA – duże obciążenie barku!'},
+{id:'tricep_machine',name:'Prostowanie ramion (maszyna)',muscle:'triceps',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+extension+machine+technique',note:'Prowadzony tor'},
+{id:'kickback',name:'Odpychanie hantla w tył (Kickback)',muscle:'triceps',equip:'wolne',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=tricep+kickback+dumbbell+technique',note:'Ramię równolegle do podłogi. Pauza na górze'},
+{id:'diamond_pushup',name:'Pompki w diament',muscle:'triceps',equip:'własne',sets:3,reps:'12–15',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=diamond+push+ups+triceps+technique',note:'Dłonie w kształt rombu. Dobra aktywacja bez sprzętu'},
+// CORE
+{id:'landmine_anti',name:'Landmine anti-rotation',muscle:'core',equip:'wolne',sets:3,reps:'8/strona',tempo:'3-0-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=landmine+anti+rotation+core',note:'Powolny łuk z boku na bok, kręgosłup neutralny'},
+{id:'landmine_rainbow',name:'Landmine rainbow',muscle:'core',equip:'wolne',sets:3,reps:'10/strona',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=landmine+rainbow+core+exercise',note:'Dynamiczniejszy wariant – łuk nad głową'},
+{id:'hollow_body',name:'Hollow body hold',muscle:'core',equip:'własne',sets:3,reps:'20–30 sek',tempo:'—',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hollow+body+hold+technique',note:'Leżysz na plecach, ręce i nogi uniesione'},
+{id:'dead_bug',name:'Dead bug',muscle:'core',equip:'własne',sets:3,reps:'8/strona',tempo:'3-0-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=dead+bug+exercise+technique',note:'Kontrolowane opuszczanie kończyn. Stabilizacja kręgosłupa'},
+{id:'plank',name:'Plank (deska)',muscle:'core',equip:'własne',sets:3,reps:'30–60 sek',tempo:'—',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=plank+perfect+form',note:'Biodra w linii, brzuch napięty'},
+{id:'side_plank',name:'Plank boczny',muscle:'core',equip:'własne',sets:3,reps:'20–40 sek/str',tempo:'—',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=side+plank+technique',note:'Na przedramieniu jeśli bark wrażliwy'},
+{id:'cable_crunch',name:'Spięcia brzucha na wyciągu',muscle:'core',equip:'kabel',sets:3,reps:'15–20',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=cable+crunch+technique',note:'Ruch z bioder, nie z ramion'},
+{id:'hanging_leg',name:'Unoszenie nóg w zwisie',muscle:'core',equip:'własne',sets:3,reps:'10–15',tempo:'2-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=hanging+leg+raise+technique',note:'Dolny brzuch. Bez huśtania'},
+{id:'ab_wheel',name:'Wałek do brzucha (Ab wheel)',muscle:'core',equip:'własne',sets:3,reps:'8–12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=ab+wheel+rollout+technique',note:'Zaawansowane – tylko gdy core stabilny'},
+{id:'pallof_press',name:'Pallof press',muscle:'core',equip:'kabel',sets:3,reps:'10/strona',tempo:'3-1-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=pallof+press+anti+rotation+core',note:'Anti-rotation stabilizacja'},
+{id:'russian_twist',name:'Skręty tułowia (Russian twist)',muscle:'core',equip:'wolne',sets:3,reps:'20',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=russian+twist+core+technique',note:'Nogi uniesione, kontrolowany ruch'},
+{id:'bird_dog',name:'Bird dog',muscle:'core',equip:'własne',sets:3,reps:'10/strona',tempo:'3-0-3',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=bird+dog+exercise+spine+stability',note:'Na czworakach – naprzemienny ruch ręka-noga'},
+// NOGI
+{id:'squat_barbell',name:'Przysiad ze sztangą',muscle:'nogi',equip:'wolne',sets:4,reps:'5–8',tempo:'2-0-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=przysiad+ze+sztanga+technika',note:'Kolana nad palcami, klatka wypięta'},
+{id:'leg_press',name:'Leg Press',muscle:'nogi',equip:'maszyna',sets:4,reps:'10–15',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=leg+press+technique+form',note:'Stopy różne ustawienia – zmienia akcent'},
+{id:'hack_squat',name:'Hack squat (maszyna)',muscle:'nogi',equip:'maszyna',sets:3,reps:'10–12',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hack+squat+machine+technique',note:'Kolana w linii z palcami'},
+{id:'bulgarian_split',name:'Przysiad bułgarski',muscle:'nogi',equip:'wolne',sets:3,reps:'10/str',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=bulgarian+split+squat+technique',note:'OSTROŻNIE – zgłaszałeś problemy z udem. Testuj bez obciążenia'},
+{id:'leg_extension',name:'Prostowanie nóg (maszyna)',muscle:'nogi',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=leg+extension+machine+technique',note:'Izolacja czworogłowego. Pauza 1 sek na górze'},
+{id:'leg_curl_lying',name:'Uginanie nóg leżąc (maszyna)',muscle:'nogi',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lying+leg+curl+machine+technique',note:'Wolne opuszczanie – ekscentryczna faza kluczowa'},
 {id:'leg_curl_seated',name:'Uginanie nóg siedząc (maszyna)',muscle:'nogi',equip:'maszyna',sets:3,reps:'12–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=seated+leg+curl+machine+technique',note:'Lepszy rozciąg dwugłowego niż wersja leżąca'},
-{id:'rdl',name:'Martwy ciąg na prostych nogach (RDL)',muscle:'nogi',equip:'wolne',sets:3,reps:'10–12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=romanian+deadlift+rdl+technique',note:'Dwugłowy i pośladki. Plecy proste, bar blisko ciała, kolana lekko ugięte'},
-{id:'hip_thrust',name:'Hip thrust (unoszenie bioder)',muscle:'nogi',equip:'wolne',sets:4,reps:'10–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hip+thrust+technique+barbell',note:'Głównie pośladki. Łopatki na ławce, napięty brzuch na górze'},
-{id:'glute_bridge',name:'Mostek (Glute bridge)',muscle:'nogi',equip:'własne',sets:3,reps:'15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=glute+bridge+technique',note:'Łatwiejsza wersja hip thrusta na podłodze. Dobra do rozgrzewki'},
-{id:'sumo_deadlift',name:'Martwy ciąg sumo',muscle:'nogi',equip:'wolne',sets:4,reps:'5–6',tempo:'2-0-1',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=sumo+deadlift+technique',note:'Szerszy rozkrok – więcej wewnętrznej powierzchni uda i pośladków'},
-{id:'calf_raise_standing',name:'Wspięcia na palce stojąc',muscle:'nogi',equip:'maszyna',sets:4,reps:'15–20',tempo:'2-2-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=standing+calf+raise+technique',note:'Pełen zakres – do max na górze, rozciągnięcie na dole. Pauza w obu punktach'},
-{id:'calf_raise_seated',name:'Wspięcia na palce siedząc',muscle:'nogi',equip:'maszyna',sets:3,reps:'15–20',tempo:'2-2-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=seated+calf+raise+technique',note:'Angażuje bardziej mięsień płaszczkowaty (głębszy)'},
-{id:'lunge',name:'Wykroki',muscle:'nogi',equip:'wolne',sets:3,reps:'10/str',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lunge+dumbbell+technique',note:'OSTROŻNIE – zgłaszałeś problemy z udem. Testuj bez obciążenia. Kolano nad palcami'},
+{id:'rdl',name:'Martwy ciąg na prostych nogach (RDL)',muscle:'nogi',equip:'wolne',sets:3,reps:'10–12',tempo:'3-1-2',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=romanian+deadlift+rdl+technique',note:'Plecy proste, bar blisko ciała'},
+{id:'hip_thrust',name:'Hip thrust (unoszenie bioder)',muscle:'nogi',equip:'wolne',sets:4,reps:'10–15',tempo:'2-1-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=hip+thrust+technique+barbell',note:'Napięty brzuch na górze'},
+{id:'calf_raise_standing',name:'Wspięcia na palce stojąc',muscle:'nogi',equip:'maszyna',sets:4,reps:'15–20',tempo:'2-2-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=standing+calf+raise+technique',note:'Pełen zakres, pauza w obu punktach'},
+{id:'calf_raise_seated',name:'Wspięcia na palce siedząc',muscle:'nogi',equip:'maszyna',sets:3,reps:'15–20',tempo:'2-2-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=seated+calf+raise+technique',note:'Angażuje mięsień płaszczkowaty'},
+{id:'lunge',name:'Wykroki',muscle:'nogi',equip:'wolne',sets:3,reps:'10/str',tempo:'2-0-2',shoulderSafe:true,yt:'https://www.youtube.com/results?search_query=lunge+dumbbell+technique',note:'OSTROŻNIE – zgłaszałeś problemy z udem. Testuj bez obciążenia'},
+{id:'sumo_deadlift',name:'Martwy ciąg sumo',muscle:'nogi',equip:'wolne',sets:4,reps:'5–6',tempo:'2-0-1',shoulderSafe:false,yt:'https://www.youtube.com/results?search_query=sumo+deadlift+technique',note:'Szerszy rozkrok – więcej wewnętrznej powierzchni uda'},
 ];
-
 
 const DEFAULT_PLAN = {
   1:{num:1,name:'Klatka + Triceps',warmup:'5 min rower + facepull 2×15',exercises:[
-    {id:'chest_machine',name:'Wyciskanie klatki (maszyna)',equip:'Maszyna chest press',sets:4,reps:'8–10',tempo:'2-0-2',note:'Łokcie ~45° do tułowia. Główne ćwiczenie dnia'},
-    {id:'pec_deck',name:'Rozpiętki (pec deck)',equip:'Maszyna pec deck',sets:3,reps:'12–15',tempo:'2-1-2',note:'Izolacja klatki. Nie przekraczaj granicy bólu barku'},
-    {id:'incline_press',name:'Wyciskanie pod skosem (maszyna)',equip:'Maszyna incline',sets:3,reps:'10–12',tempo:'2-0-2',note:'Górna część klatki. Skok pod 30–45°'},
-    {id:'cable_cross',name:'Krzyżowanie linek (kable)',equip:'Wyciąg dolny',sets:3,reps:'12–15',tempo:'2-1-2',note:'Ruch do góry i do środka'},
-    {id:'tricep_pushdown',name:'Prostowanie ramion (wyciąg)',equip:'Wyciąg górny V-bar',sets:4,reps:'12–15',tempo:'2-1-2',note:'Łokcie przy tułowiu. ⚡ Superseria z ćwiczeniem poniżej'},
-    {id:'tricep_overhead',name:'Prostowanie nad głową (maszyna)',equip:'Maszyna triceps',sets:3,reps:'12',tempo:'2-1-2',note:'Długa głowa tricepsa. ⚡ Superseria z ćwiczeniem powyżej'},
-    {id:'landmine_anti',name:'Landmine anti-rotation',equip:'Landmine',sets:3,reps:'8/strona',tempo:'3-0-3',note:'Core na koniec – powolny łuk, kręgosłup neutralny'}
+    {id:'chest_machine_press',name:'Wyciskanie klatki (maszyna)',equip:'Maszyna chest press',sets:4,reps:'8–10',tempo:'2-0-2',note:'Łokcie ~45°. Główne ćwiczenie dnia'},
+    {id:'pec_deck',name:'Rozpiętki (pec deck)',equip:'Maszyna pec deck',sets:3,reps:'12–15',tempo:'2-1-2',note:'Nie przekraczaj granicy bólu barku'},
+    {id:'cable_fly_low',name:'Rozpiętki z wyciągu dolnego',equip:'Wyciąg dolny',sets:3,reps:'12–15',tempo:'2-1-2',note:'Ruch do góry i do środka'},
+    {id:'tricep_pushdown_vbar',name:'Prostowanie ramion (V-bar)',equip:'Wyciąg górny',sets:4,reps:'12–15',tempo:'2-1-2',note:'⚡ Superseria z ćwiczeniem poniżej'},
+    {id:'tricep_overhead_cable',name:'Prostowanie nad głową (wyciąg)',equip:'Wyciąg górny',sets:3,reps:'12',tempo:'2-1-2',note:'⚡ Superseria z ćwiczeniem powyżej'},
+    {id:'landmine_anti',name:'Landmine anti-rotation',equip:'Landmine',sets:3,reps:'8/strona',tempo:'3-0-3',note:'Core na koniec'},
   ]},
-  2:{num:2,name:'Plecy + Biceps',warmup:'5 min rower + rotacje ramion z gumą 2×15 + facepull',exercises:[
-    {id:'seated_row',name:'Wiosłowanie siedząc (maszyna)',equip:'Maszyna seated row',sets:4,reps:'8–10',tempo:'2-1-2',note:'Łopatki razem na końcu, klatka wypięta'},
-    {id:'lat_pulldown',name:'Ściąganie drążka do klatki',equip:'Wyciąg górny',sets:4,reps:'10–12',tempo:'2-1-2',note:'Do mostka, nie za głowę – chroni barki'},
-    {id:'chest_row',name:'Wiosłowanie (chest pad)',equip:'Maszyna T-bar',sets:3,reps:'10–12',tempo:'2-1-2',note:'Klatka na podparciu = zero kompensacji'},
-    {id:'straight_arm',name:'Ściąganie ramion w dół',equip:'Wyciąg górny',sets:3,reps:'15',tempo:'2-1-2',note:'Izoluje najszerszy bez angażowania bicepsa'},
-    {id:'facepull',name:'Facepull',equip:'Wyciąg sznurowy',sets:4,reps:'15',tempo:'2-1-2',note:'OBOWIĄZKOWE – zdrowie barków. Nie pomijaj!'},
-    {id:'hammer_curl',name:'Hammer curl (kabel dolny)',equip:'Wyciąg dolny',sets:3,reps:'12–15',tempo:'2-1-3',note:'Kciuk do góry, powolne opuszczanie 3 sek'},
-    {id:'preacher_curl',name:'Preacher curl (maszyna)',equip:'Maszyna preacher',sets:3,reps:'12',tempo:'2-1-3',note:'Łokieć na poduszce, pauza 1 sek na górze'}
+  2:{num:2,name:'Plecy + Biceps',warmup:'5 min rower + rotacje z gumą 2×15 + facepull',exercises:[
+    {id:'seated_row_cable',name:'Wiosłowanie siedząc na wyciągu',equip:'Wyciąg dolny',sets:4,reps:'8–10',tempo:'2-1-2',note:'Łopatki razem na końcu'},
+    {id:'lat_pulldown_neutral',name:'Ściąganie chwytem neutralnym',equip:'Wyciąg górny',sets:4,reps:'10–12',tempo:'2-1-2',note:'Najłagodniejsze dla barku'},
+    {id:'chest_supported_row',name:'Wiosłowanie (chest pad)',equip:'Maszyna T-bar',sets:3,reps:'10–12',tempo:'2-1-2',note:'Zero kompensacji kręgosłupem'},
+    {id:'straight_arm',name:'Ściąganie ramion w dół',equip:'Wyciąg górny',sets:3,reps:'15',tempo:'2-1-2',note:'Izoluje najszerszy'},
+    {id:'facepull',name:'Facepull',equip:'Wyciąg sznurowy',sets:4,reps:'15',tempo:'2-1-2',note:'OBOWIĄZKOWE – nie pomijaj!'},
+    {id:'hammer_curl_cable',name:'Hammer curl (wyciąg)',equip:'Wyciąg dolny',sets:3,reps:'12–15',tempo:'2-1-3',note:'Kciuk do góry, wolne opuszczanie'},
+    {id:'preacher_curl',name:'Preacher curl (maszyna)',equip:'Maszyna preacher',sets:3,reps:'12',tempo:'2-1-3',note:'Pauza 1 sek na górze'},
   ]},
-  3:{num:3,name:'Barki + Core',warmup:'5 min rower + rotatory zewnętrzne 2×15 + facepull 2×15',exercises:[
-    {id:'lateral_raise',name:'Unoszenie w bok (maszyna)',equip:'Maszyna lateral raise',sets:4,reps:'15',tempo:'2-0-2',note:'Lekki ciężar – nie powyżej 90°'},
-    {id:'front_raise',name:'Unoszenie przodem (kable)',equip:'Wyciąg dolny',sets:3,reps:'12',tempo:'2-0-2',note:'Przednia głowa barku – naprzemiennie'},
-    {id:'facepull_rot',name:'Facepull z rotacją',equip:'Wyciąg sznurowy',sets:4,reps:'15',tempo:'2-1-2',note:'Rotacja na zewnątrz – tylna głowa + rotatory'},
-    {id:'shrugs',name:'Szrugi (maszyna)',equip:'Maszyna shrug',sets:3,reps:'15',tempo:'2-2-1',note:'Czworoboczny górny – pomaga w stabilizacji'},
-    {id:'ext_rot',name:'Rotatory zewnętrzne barku',equip:'Guma / wyciąg',sets:3,reps:'15',tempo:'2-1-2',note:'PROFILAKTYKA – obowiązkowe. Łokieć przy boku'},
-    {id:'landmine_anti',name:'Landmine anti-rotation',equip:'Landmine',sets:3,reps:'8/strona',tempo:'3-0-3',note:'Core – powolny łuk, kręgosłup neutralny'},
-    {id:'landmine_rainbow',name:'Landmine rainbow',equip:'Landmine',sets:3,reps:'10/strona',tempo:'2-0-2',note:'Dynamiczniejszy wariant – łuk nad głową'},
-    {id:'hollow_body',name:'Hollow body hold',equip:'Mata',sets:3,reps:'20–30 sek',tempo:'—',note:'Napięcie całego core, ręce i nogi uniesione'}
+  3:{num:3,name:'Barki + Core',warmup:'5 min rower + rotatory 2×15 + facepull 2×15',exercises:[
+    {id:'lateral_raise_machine',name:'Unoszenie w bok (maszyna)',equip:'Maszyna lateral raise',sets:4,reps:'15',tempo:'2-0-2',note:'Nie powyżej 90°'},
+    {id:'rear_delt_fly',name:'Wznosy w opadzie tułowia',equip:'Hantle',sets:4,reps:'15',tempo:'2-0-2',note:'Tylna głowa barku'},
+    {id:'facepull_rotation',name:'Facepull z rotacją zewnętrzną',equip:'Wyciąg sznurowy',sets:4,reps:'15',tempo:'2-1-2',note:'Rotacja na zewnątrz na końcu'},
+    {id:'shrugs_machine',name:'Szrugi (maszyna)',equip:'Maszyna shrug',sets:3,reps:'15',tempo:'2-2-1',note:'Pauza na górze'},
+    {id:'ext_rotation_cable',name:'Rotatory zewnętrzne barku',equip:'Wyciąg boczny',sets:3,reps:'15',tempo:'2-1-2',note:'PROFILAKTYKA – obowiązkowe'},
+    {id:'landmine_rainbow',name:'Landmine rainbow',equip:'Landmine',sets:3,reps:'10/strona',tempo:'2-0-2',note:'Dynamiczny wariant core'},
+    {id:'hollow_body',name:'Hollow body hold',equip:'Mata',sets:3,reps:'20–30 sek',tempo:'—',note:'Napięcie całego core'},
   ]},
   4:{num:4,name:'Nogi + Cardio',warmup:'Rozgrzewka dynamiczna 5 min',exercises:[
-    {id:'leg_press',name:'Leg Press',equip:'Maszyna leg press',sets:3,reps:'12–15',tempo:'2-0-2',note:'Podtrzymanie – nie zwiększaj ciężaru'},
-    {id:'leg_curl',name:'Uginanie nóg (leżąc)',equip:'Maszyna leg curl',sets:3,reps:'12–15',tempo:'2-1-2',note:'Podtrzymanie tylnego uda'},
-    {id:'calf_raise',name:'Wspięcia na palce',equip:'Maszyna calf',sets:3,reps:'15–20',tempo:'2-1-2',note:'Podtrzymanie'}
+    {id:'leg_press',name:'Leg Press',equip:'Maszyna leg press',sets:3,reps:'12–15',tempo:'2-0-2',note:'Podtrzymanie'},
+    {id:'leg_curl_lying',name:'Uginanie nóg leżąc',equip:'Maszyna leg curl',sets:3,reps:'12–15',tempo:'2-1-2',note:'Podtrzymanie tylnego uda'},
+    {id:'calf_raise_standing',name:'Wspięcia na palce stojąc',equip:'Maszyna calf',sets:4,reps:'15–20',tempo:'2-2-2',note:'Pełen zakres'},
   ]}
 };
 
 // ══ STATE ══
-let DB = JSON.parse(localStorage.getItem('dg_db') || '{"workouts":[]}');
-let PLAN = JSON.parse(localStorage.getItem('dg_plan') || 'null') || deepClone(DEFAULT_PLAN);
-let EX_DB = JSON.parse(localStorage.getItem('dg_exdb') || 'null') || deepClone(DEFAULT_EX_DB);
-let activeWorkout = null, workoutTimer = null, workoutSeconds = 0;
-let restTimer = null, restRemaining = 0, restTotal = 90, restCB = null;
-let dbFMuscle = 'all', dbFEquip = 'all', dbFShoulder = false;
-let atpExId = null;
+window.DB = {workouts:[]};
+window.PLAN = deepClone(DEFAULT_PLAN);
+window.EX_DB = deepClone(DEFAULT_EX_DB);
+let activeWorkout=null,workoutTimer=null,workoutSeconds=0;
+let restTimer=null,restRemaining=0,restTotal=90,restCB=null;
+let dbFMuscle='all',dbFEquip='all',dbFShoulder=false,atpExId=null;
 
 function deepClone(o){return JSON.parse(JSON.stringify(o))}
-function saveDB(){localStorage.setItem('dg_db',JSON.stringify(DB))}
-function savePlan(){localStorage.setItem('dg_plan',JSON.stringify(PLAN))}
-function saveExDB(){localStorage.setItem('dg_exdb',JSON.stringify(EX_DB))}
 function getRestTime(){return parseInt(document.getElementById('rest-time').value)||90}
 
-// ══ NAV ══
-function showPage(id){
+// ── SYNC STATUS ──
+window.setSyncStatus = function(state, text) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-text');
+  if(dot) {dot.className='sync-dot '+state;}
+  if(txt) txt.textContent=text;
+};
+
+// ── AUTH FUNCTIONS ──
+window.switchAuthTab = function(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='login'?0:1)));
+  document.getElementById('auth-login').style.display = tab==='login'?'block':'none';
+  document.getElementById('auth-register').style.display = tab==='register'?'block':'none';
+  document.getElementById('auth-err').textContent='';
+};
+
+window.doLogin = async function() {
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('auth-err');
+  if(!email||!pass){errEl.textContent='Wpisz email i hasło';return;}
+  try {
+    const {auth,signInWithEmailAndPassword}=window._fb;
+    await signInWithEmailAndPassword(auth,email,pass);
+  } catch(e) {
+    const msgs={'auth/user-not-found':'Nie znaleziono konta','auth/wrong-password':'Błędne hasło','auth/invalid-email':'Nieprawidłowy email','auth/invalid-credential':'Błędny email lub hasło'};
+    errEl.textContent=msgs[e.code]||'Błąd logowania: '+e.code;
+  }
+};
+
+window.doRegister = async function() {
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  const pass2=document.getElementById('reg-pass2').value;
+  const errEl=document.getElementById('auth-err');
+  if(!email||!pass){errEl.textContent='Wpisz email i hasło';return;}
+  if(pass!==pass2){errEl.textContent='Hasła nie są identyczne';return;}
+  if(pass.length<6){errEl.textContent='Hasło musi mieć min. 6 znaków';return;}
+  try {
+    const {auth,createUserWithEmailAndPassword}=window._fb;
+    await createUserWithEmailAndPassword(auth,email,pass);
+  } catch(e) {
+    const msgs={'auth/email-already-in-use':'Konto z tym emailem już istnieje','auth/invalid-email':'Nieprawidłowy email'};
+    errEl.textContent=msgs[e.code]||'Błąd rejestracji: '+e.code;
+  }
+};
+
+window.doLogout = async function() {
+  const {auth,signOut}=window._fb;
+  await signOut(auth);
+  closeModal('modal-settings');
+};
+
+window.doResetPassword = async function() {
+  const email=document.getElementById('login-email').value.trim();
+  if(!email){document.getElementById('auth-err').textContent='Wpisz email aby zresetować hasło';return;}
+  try {
+    const {auth,sendPasswordResetEmail}=window._fb;
+    await sendPasswordResetEmail(auth,email);
+    document.getElementById('auth-err').style.color='var(--green)';
+    document.getElementById('auth-err').textContent='Email resetujący wysłany!';
+  } catch(e){document.getElementById('auth-err').textContent='Błąd: '+e.code;}
+};
+
+// ── NAV ──
+window.showPage = function(id) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -630,26 +768,26 @@ function showPage(id){
   if(id==='page-progress')renderProgress();
   if(id==='page-exercises')renderExDB();
   if(id==='page-plans')renderPlans();
-}
-function openModal(id){document.getElementById(id).classList.add('show')}
-function closeModal(id){document.getElementById(id).classList.remove('show')}
+};
+window.openModal = function(id){document.getElementById(id).classList.add('show');};
+window.closeModal = function(id){document.getElementById(id).classList.remove('show');};
 
-// ══ HOME ══
-function renderHome(){
+// ── HOME ──
+window.renderHome = function() {
   const now=new Date();
   const days=['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
   const months=['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
   document.getElementById('home-date').innerHTML=`<strong>${days[now.getDay()]}</strong>${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
   document.getElementById('stat-total').textContent=DB.workouts.length;
-  const wkS=new Date();wkS.setDate(wkS.getDate()-wkS.getDay());
-  document.getElementById('stat-week').textContent=DB.workouts.filter(w=>new Date(w.date)>=wkS).length;
+  const ws=new Date();ws.setDate(ws.getDate()-ws.getDay());
+  document.getElementById('stat-week').textContent=DB.workouts.filter(w=>new Date(w.date)>=ws).length;
   const sorted=[...DB.workouts].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const uDates=[...new Set(sorted.map(w=>new Date(w.date).toDateString()))];
-  let cur=0,maxS=0,prev=null;
-  for(const d of uDates){const dd=new Date(d);if(!prev){cur=1;}else{cur=(prev-dd)/86400000<=1.5?cur+1:1;}maxS=Math.max(maxS,cur);prev=dd;}
-  const streak=uDates[0]===new Date().toDateString()?cur:0;
+  const uD=[...new Set(sorted.map(w=>new Date(w.date).toDateString()))];
+  let cur=0,mx=0,prev=null;
+  for(const d of uD){const dd=new Date(d);if(!prev){cur=1;}else{cur=(prev-dd)/86400000<=1.5?cur+1:1;}mx=Math.max(mx,cur);prev=dd;}
+  const streak=uD[0]===new Date().toDateString()?cur:0;
   document.getElementById('stat-streak').textContent=streak;
-  document.getElementById('stat-best').textContent='🔥 Rekord: '+maxS;
+  document.getElementById('streak-best').textContent='🔥 Rekord: '+mx;
   document.getElementById('streak-count').textContent=streak>0?`🔥 ${streak} dni z rzędu`:'Brak aktywnej serii';
   const tv=DB.workouts.reduce((s,w)=>s+calcVol(w),0);
   document.getElementById('stat-vol').textContent=Math.round(tv/1000)+'t';
@@ -660,12 +798,12 @@ function renderHome(){
   const d=new Date(last.date);
   lw.innerHTML=`<div class="hist-item" onclick="openWDetail(${DB.workouts.length-1})">
     <div class="hist-top"><span class="hist-day" style="color:var(--accent)">Trening ${last.day}</span><span class="badge badge-muted">${d.toLocaleDateString('pl-PL')}</span></div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:8px">${PLAN[last.day]?.name||''}</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:6px">${PLAN[last.day]?.name||''}</div>
     <div class="hist-stats"><span>⏱ ${last.duration||'–'}</span><span>📦 ${calcVol(last)} kg</span></div>
   </div>`;
-}
+};
 
-function renderDayChips(){
+window.renderDayChips = function() {
   const w=document.getElementById('day-select');w.innerHTML='';
   Object.values(PLAN).forEach((day,i)=>{
     const c=document.createElement('div');c.className='chip'+(i===0?' on':'');c.dataset.day=day.num;
@@ -673,9 +811,9 @@ function renderDayChips(){
     c.onclick=()=>{document.querySelectorAll('.chip[data-day]').forEach(x=>x.classList.remove('on'));c.classList.add('on');};
     w.appendChild(c);
   });
-}
+};
 
-function renderStreak(){
+window.renderStreak = function() {
   const g=document.getElementById('streak-grid');g.innerHTML='';
   const today=new Date();today.setHours(0,0,0,0);
   const sDay=today.getDay()||7;
@@ -688,24 +826,24 @@ function renderStreak(){
     if(d.getTime()===today.getTime())div.classList.add('today');
     g.appendChild(div);
   }
-}
+};
 
 function calcVol(w){return Math.round((w.exercises||[]).reduce((s,e)=>s+(e.sets||[]).reduce((s2,st)=>st.done&&st.kg&&st.reps?s2+parseFloat(st.kg)*parseInt(st.reps):s2,0),0));}
 
-// ══ WORKOUT ══
-function startWorkout(){
+// ── WORKOUT ──
+window.startWorkout = function() {
   const dayNum=parseInt(document.querySelector('.chip.on[data-day]')?.dataset.day||'1');
   const plan=deepClone(PLAN[dayNum]);
-  if(!plan){alert('Brak planu. Utwórz plan w zakładce Plany.');return;}
+  if(!plan){alert('Brak planu. Utwórz w zakładce Plany.');return;}
   activeWorkout={id:Date.now(),day:dayNum,date:new Date().toISOString(),note:document.getElementById('pre-note').value,duration:null,
     exercises:plan.exercises.map(ex=>({...ex,sets:Array.from({length:ex.sets||3},(_,i)=>({num:i+1,kg:'',reps:'',done:false}))}))};
   workoutSeconds=0;clearInterval(workoutTimer);
   workoutTimer=setInterval(()=>{workoutSeconds++;const m=String(Math.floor(workoutSeconds/60)).padStart(2,'0'),s=String(workoutSeconds%60).padStart(2,'0');document.getElementById('workout-clock').textContent=m+':'+s;document.getElementById('workout-vol').textContent=calcVol(activeWorkout)+' kg';},1000);
   document.getElementById('workout-title').textContent=`Trening ${dayNum} – ${plan.name}`;
   renderExercises();showPage('page-workout');
-}
+};
 
-function renderExercises(){
+window.renderExercises = function() {
   if(!activeWorkout)return;
   const list=document.getElementById('exercises-list');list.innerHTML='';
   activeWorkout.exercises.forEach((ex,ei)=>{
@@ -723,7 +861,7 @@ function renderExercises(){
     div.innerHTML=`
       <div class="ex-header" onclick="toggleEx(${ei})">
         <div><div class="ex-name">${ex.name}</div>
-          <div class="ex-meta">${sc} serii × ${ex.reps} powt. · ${ex.tempo}${allDone?` · <span style="color:var(--green)">✓ gotowe</span>`:''}</div>
+          <div class="ex-meta">${sc} serii × ${ex.reps} · ${ex.tempo}${allDone?` · <span style="color:var(--green)">✓</span>`:''}</div>
           ${orm>0?`<div class="onerm-badge">⭐ 1RM ~${orm} kg</div>`:''}
         </div>
         <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -735,62 +873,63 @@ function renderExercises(){
       </div>`;
     list.appendChild(div);
   });
-}
+};
 
-function toggleEx(ei){const r=document.getElementById('ex-'+ei);const b=r.querySelector('.ex-body');const o=r.classList.toggle('open');b.style.display=o?'block':'none';}
-function setVal(ei,si,f,v){if(activeWorkout)activeWorkout.exercises[ei].sets[si][f]=v;}
+window.toggleEx = function(ei){const r=document.getElementById('ex-'+ei);const b=r.querySelector('.ex-body');const o=r.classList.toggle('open');b.style.display=o?'block':'none';};
+window.setVal = function(ei,si,f,v){if(activeWorkout)activeWorkout.exercises[ei].sets[si][f]=v;};
 
-function toggleSet(ei,si){
+window.toggleSet = function(ei,si) {
   if(!activeWorkout)return;
-  const st=activeWorkout.exercises[ei].sets[si];
-  st.done=!st.done;
+  const st=activeWorkout.exercises[ei].sets[si];st.done=!st.done;
   const kEl=document.querySelector(`#sr-${ei}-${si} input[placeholder="kg"]`);
   const rEl=document.querySelector(`#sr-${ei}-${si} input[placeholder="powt."]`);
   st.kg=parseFloat(kEl?.value)||0;st.reps=parseInt(rEl?.value)||0;
   if(st.done){
     const ex=activeWorkout.exercises[ei];let ni='';
-    if(si+1<ex.sets.length)ni=`Następna: seria ${si+2} – ${ex.name}`;
-    else{const nIdx=activeWorkout.exercises.findIndex((e,i)=>i>ei&&e.sets.some(s=>!s.done));ni=nIdx>=0?`Następne: ${activeWorkout.exercises[nIdx].name}`:'Ostatnia seria – świetna robota!';}
+    if(si+1<ex.sets.length)ni=`Następna seria ${si+2} – ${ex.name}`;
+    else{const nIdx=activeWorkout.exercises.findIndex((e,i)=>i>ei&&e.sets.some(s=>!s.done));ni=nIdx>=0?`Następne: ${activeWorkout.exercises[nIdx].name}`:'Ostatnia seria!';}
     startRest(getRestTime(),ni,()=>renderExercises());
-  }else renderExercises();
-}
+  } else renderExercises();
+};
 
-function calcOneRM(ex){let b=0;(ex.sets||[]).forEach(s=>{if(s.done&&s.kg&&s.reps){const k=parseFloat(s.kg),r=parseInt(s.reps);if(k>0&&r>0)b=Math.max(b,Math.round(k*(1+r/30)));}}); return b;}
+function calcOneRM(ex){let b=0;(ex.sets||[]).forEach(s=>{if(s.done&&s.kg&&s.reps){const k=parseFloat(s.kg),r=parseInt(s.reps);if(k>0&&r>0)b=Math.max(b,Math.round(k*(1+r/30)));}});return b;}
 
-// ══ REST ══
-function startRest(secs,txt,cb){
+// ── REST ──
+window.startRest = function(secs,txt,cb) {
   restTotal=secs;restRemaining=secs;restCB=cb;
   document.getElementById('rest-num').textContent=secs;
   document.getElementById('rest-next').textContent=txt||'';
   document.getElementById('rest-overlay').classList.add('show');
   clearInterval(restTimer);
   restTimer=setInterval(()=>{restRemaining--;document.getElementById('rest-num').textContent=restRemaining;document.getElementById('rest-arc').style.strokeDashoffset=427*(1-restRemaining/restTotal);if(restRemaining<=0)skipRest();},1000);
-}
-function skipRest(){clearInterval(restTimer);document.getElementById('rest-overlay').classList.remove('show');if(restCB){restCB();restCB=null;}}
+};
+window.skipRest = function(){clearInterval(restTimer);document.getElementById('rest-overlay').classList.remove('show');if(restCB){restCB();restCB=null;}};
 
-// ══ FINISH ══
-function finishWorkout(){
+// ── FINISH WORKOUT ──
+window.finishWorkout = async function() {
   if(!activeWorkout)return;
   clearInterval(workoutTimer);
   const m=String(Math.floor(workoutSeconds/60)).padStart(2,'0'),s=String(workoutSeconds%60).padStart(2,'0');
   activeWorkout.duration=m+':'+s;
-  DB.workouts.push(deepClone(activeWorkout));saveDB();
-  skipRest();activeWorkout=null;workoutSeconds=0;showPage('page-home');
-}
+  DB.workouts.push(deepClone(activeWorkout));
+  await window.saveWorkoutToCloud(activeWorkout);
+  skipRest();activeWorkout=null;workoutSeconds=0;
+  showPage('page-home');
+};
 
-// ══ HISTORY ══
-function renderHistory(){
+// ── HISTORY ──
+window.renderHistory = function() {
   const list=document.getElementById('history-list');
   if(!DB.workouts.length){list.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg><p>Brak zapisanych treningów</p></div>';return;}
   list.innerHTML=[...DB.workouts].reverse().map((w,ri)=>{const i=DB.workouts.length-1-ri;const d=new Date(w.date);
     return `<div class="hist-item" onclick="openWDetail(${i})">
       <div class="hist-top"><span class="hist-day" style="color:var(--accent)">Trening ${w.day}</span><span class="badge badge-muted">${d.toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short'})}</span></div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:6px">${PLAN[w.day]?.name||''}</div>
-      <div class="hist-stats"><span>⏱ ${w.duration||'–'}</span><span>📦 ${calcVol(w)} kg</span>${w.note?`<span style="font-style:italic">"${w.note}"</span>`:''}</div>
+      <div class="hist-stats"><span>⏱ ${w.duration||'–'}</span><span>📦 ${calcVol(w)} kg</span>${w.note?`<span>"${w.note}"</span>`:''}</div>
     </div>`;}).join('');
-}
+};
 
-function openWDetail(idx){
+window.openWDetail = function(idx) {
   const w=DB.workouts[idx];if(!w)return;
   const d=new Date(w.date);
   document.getElementById('modal-detail-title').textContent=`Trening ${w.day} – ${d.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})}`;
@@ -798,16 +937,16 @@ function openWDetail(idx){
   (w.exercises||[]).forEach(ex=>{const ds=ex.sets.filter(s=>s.done);if(!ds.length)return;const orm=calcOneRM(ex);
     h+=`<div style="margin-bottom:14px"><div style="font-weight:600;font-size:14px;margin-bottom:4px">${ex.name}</div>${orm>0?`<div class="onerm-badge" style="margin-bottom:6px">⭐ 1RM ~${orm} kg</div>`:''}${ds.map(s=>`<div style="font-size:13px;color:var(--muted);margin-bottom:3px">Seria ${s.num}: <strong style="color:var(--text)">${s.kg} kg × ${s.reps}</strong></div>`).join('')}</div>`;});
   document.getElementById('modal-detail-body').innerHTML=h;openModal('modal-detail');
-}
+};
 
-// ══ PROGRESS ══
-function renderProgress(){
+// ── PROGRESS ──
+window.renderProgress = function() {
   const sel=document.getElementById('progress-ex-select');
   const allEx={};Object.values(PLAN).forEach(d=>(d.exercises||[]).forEach(e=>{allEx[e.id]=e.name;}));
   sel.innerHTML=Object.entries(allEx).map(([id,n])=>`<option value="${id}">${n}</option>`).join('');
   renderProgressChart();renderVolBreakdown();
-}
-function renderProgressChart(){
+};
+window.renderProgressChart = function() {
   const exId=document.getElementById('progress-ex-select').value;
   const allEx={};Object.values(PLAN).forEach(d=>(d.exercises||[]).forEach(e=>{allEx[e.id]=e.name;}));
   document.getElementById('prog-ex-name').textContent=allEx[exId]||exId;
@@ -823,8 +962,7 @@ function renderProgressChart(){
   else document.getElementById('prog-trend').textContent='–';
   drawChart(pts);
   if(pts.length>=2){const lbs=pts.slice(-6).map(p=>p.date.toLocaleDateString('pl-PL',{day:'numeric',month:'short'}));document.getElementById('prog-axis').innerHTML=`<span>${lbs[0]}</span><span>${lbs[lbs.length-1]}</span>`;}
-  else document.getElementById('prog-axis').innerHTML='';
-}
+};
 function drawChart(pts){
   const cv=document.getElementById('progress-canvas');const ctx=cv.getContext('2d');
   const W=cv.offsetWidth||340,H=140;cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);
@@ -840,35 +978,33 @@ function drawChart(pts){
   data.forEach((v,i)=>{ctx.beginPath();ctx.arc(tx(i),ty(v),4,0,Math.PI*2);ctx.fillStyle=i===data.length-1?'#ff3c2f':'rgba(255,60,47,0.5)';ctx.fill();
     if(i===data.length-1){ctx.fillStyle='#f0f0f8';ctx.font='bold 12px Barlow,sans-serif';ctx.textAlign='center';ctx.fillText(v+' kg',tx(i),ty(v)-10);}});
 }
-function renderVolBreakdown(){
+window.renderVolBreakdown = function() {
   const now=new Date();const ws=new Date(now);ws.setDate(now.getDate()-7);
   const grp={klatka:0,triceps:0,plecy:0,biceps:0,barki:0,core:0,nogi:0};
-  const mp={chest_machine:'klatka',pec_deck:'klatka',incline_press:'klatka',cable_cross:'klatka',tricep_pushdown:'triceps',tricep_overhead:'triceps',tricep_dip:'triceps',seated_row:'plecy',lat_pulldown:'plecy',chest_row:'plecy',straight_arm:'plecy',facepull:'plecy',hammer_curl:'biceps',preacher_curl:'biceps',incline_curl:'biceps',lateral_raise:'barki',front_raise:'barki',facepull_rot:'barki',shrugs:'barki',ext_rot:'barki',landmine_anti:'core',landmine_rainbow:'core',landmine_press:'core',hollow_body:'core',cable_crunch:'core',hanging_leg:'core',ab_wheel:'core',plank:'core',side_plank:'core',dead_bug:'core',leg_press:'nogi',leg_curl:'nogi',calf_raise:'nogi',leg_ext:'nogi'};
-  DB.workouts.filter(w=>new Date(w.date)>=ws).forEach(w=>(w.exercises||[]).forEach(ex=>{const g=mp[ex.id];if(!g)return;const v=(ex.sets||[]).reduce((s,st)=>st.done&&st.kg&&st.reps?s+parseFloat(st.kg)*parseInt(st.reps):s,0);grp[g]=(grp[g]||0)+v;}));
+  const muscleMap={};
+  DEFAULT_EX_DB.forEach(e=>{muscleMap[e.id]=e.muscle;});
+  DB.workouts.filter(w=>new Date(w.date)>=ws).forEach(w=>(w.exercises||[]).forEach(ex=>{const g=muscleMap[ex.id];if(!g||!grp.hasOwnProperty(g))return;const v=(ex.sets||[]).reduce((s,st)=>st.done&&st.kg&&st.reps?s+parseFloat(st.kg)*parseInt(st.reps):s,0);grp[g]+=v;}));
   const mx=Math.max(...Object.values(grp),1);
   const cl={klatka:'#ff3c2f',triceps:'#ff7a14',plecy:'#3498db',biceps:'#2980b9',barki:'#9b59b6',core:'#f5c842',nogi:'#2ecc71'};
   document.getElementById('vol-breakdown').innerHTML=Object.entries(grp).map(([g,v])=>`
     <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="text-transform:capitalize;font-weight:500">${g}</span><span style="color:var(--muted)">${Math.round(v)} kg</span></div>
-    <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.round((v/mx)*100)}%;background:${cl[g]||'var(--accent)'};border-radius:3px"></div></div></div>`).join('');
-}
+    <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.round((v/mx)*100)}%;background:${cl[g]};border-radius:3px"></div></div></div>`).join('');
+};
 
-// ══ EXERCISE DB ══
+// ── EXERCISE DB ──
 const ML=[{id:'all',lbl:'Wszystkie'},{id:'klatka',lbl:'Klatka'},{id:'plecy',lbl:'Plecy'},{id:'barki',lbl:'Barki'},{id:'biceps',lbl:'Biceps'},{id:'triceps',lbl:'Triceps'},{id:'core',lbl:'Core/Brzuch'},{id:'nogi',lbl:'Nogi'}];
-const MLN={klatka:'Klatka',plecy:'Plecy',barki:'Barki',biceps:'Biceps',triceps:'Triceps',core:'Core / Brzuch',nogi:'Nogi'};
+const MLN={klatka:'Klatka',plecy:'Plecy',barki:'Barki',biceps:'Biceps',triceps:'Triceps',core:'Core/Brzuch',nogi:'Nogi'};
 const ELN={maszyna:'Maszyna',kabel:'Kable',wolne:'Wolne ciężary',własne:'Własne ciało'};
 
-function renderExDB(){
+window.renderExDB = function() {
   const mf=document.getElementById('muscle-filter');
-  if(!mf.hasChildNodes()){
-    ML.forEach(m=>{const c=document.createElement('button');c.className='filter-chip'+(m.id==='all'?' active':'');c.textContent=m.lbl;c.dataset.muscle=m.id;
-      c.onclick=()=>{dbFMuscle=m.id;document.querySelectorAll('#muscle-filter .filter-chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');renderExDB();};mf.appendChild(c);});
-  }
+  if(!mf.hasChildNodes()){ML.forEach(m=>{const c=document.createElement('button');c.className='filter-chip'+(m.id==='all'?' active':'');c.textContent=m.lbl;c.dataset.muscle=m.id;c.onclick=()=>{dbFMuscle=m.id;document.querySelectorAll('#muscle-filter .filter-chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');renderExDB();};mf.appendChild(c);});}
   let list=[...EX_DB];
   if(dbFMuscle!=='all')list=list.filter(e=>e.muscle===dbFMuscle);
   if(dbFEquip!=='all')list=list.filter(e=>e.equip===dbFEquip);
   if(dbFShoulder)list=list.filter(e=>e.shoulderSafe);
   const el=document.getElementById('exercise-db-list');
-  if(!list.length){el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Brak ćwiczeń dla tych filtrów</p></div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg><p>Brak ćwiczeń dla tych filtrów</p></div>';return;}
   el.innerHTML=list.map(ex=>`
     <div class="ex-db-card" id="edb-${ex.id}">
       <div class="ex-db-header" onclick="toggleEDB('${ex.id}')">
@@ -893,109 +1029,82 @@ function renderExDB(){
         </div>
       </div>
     </div>`).join('');
-}
+};
 
-function toggleEDB(id){const c=document.getElementById('edb-'+id);if(!c)return;const was=c.classList.contains('open');document.querySelectorAll('.ex-db-card.open').forEach(x=>x.classList.remove('open'));if(!was)c.classList.add('open');}
+window.toggleEDB = function(id){const c=document.getElementById('edb-'+id);if(!c)return;const was=c.classList.contains('open');document.querySelectorAll('.ex-db-card.open').forEach(x=>x.classList.remove('open'));if(!was)c.classList.add('open');};
+window.toggleShoulderF = function(){dbFShoulder=!dbFShoulder;document.getElementById('fc-shoulder').classList.toggle('active',dbFShoulder);renderExDB();};
+window.setEquipF = function(v){dbFEquip=v;document.querySelectorAll('[id^="fc-equip-"]').forEach(b=>b.classList.remove('active-outline','active'));const b=document.getElementById('fc-equip-'+v);if(b)b.classList.add(v==='all'?'active-outline':'active');renderExDB();};
 
-function toggleShoulderF(){dbFShoulder=!dbFShoulder;document.getElementById('fc-shoulder').classList.toggle('active',dbFShoulder);renderExDB();}
-function setEquipF(v){
-  dbFEquip=v;
-  document.querySelectorAll('[id^="fc-equip-"]').forEach(b=>b.classList.remove('active-outline','active'));
-  const id='fc-equip-'+v;const b=document.getElementById(id);if(b)b.classList.add(v==='all'?'active-outline':'active');
-  renderExDB();
-}
-
-function saveNewExercise(){
+window.saveNewExercise = async function() {
   const name=document.getElementById('ae-name').value.trim();
-  if(!name){alert('Podaj nazwę ćwiczenia');return;}
-  EX_DB.push({id:'c_'+Date.now(),name,muscle:document.getElementById('ae-muscle').value,equip:document.getElementById('ae-equip').value,sets:parseInt(document.getElementById('ae-sets').value)||3,reps:document.getElementById('ae-reps').value||'10–12',tempo:'2-1-2',shoulderSafe:document.getElementById('ae-shoulder').checked,yt:document.getElementById('ae-yt').value.trim(),note:document.getElementById('ae-note').value.trim(),custom:true});
-  saveExDB();closeModal('modal-add-ex');renderExDB();
-}
-function delEx(id){if(!confirm('Usunąć ćwiczenie?'))return;EX_DB=EX_DB.filter(e=>e.id!==id);saveExDB();renderExDB();}
+  if(!name){alert('Podaj nazwę');return;}
+  const ex={id:'c_'+Date.now(),name,muscle:document.getElementById('ae-muscle').value,equip:document.getElementById('ae-equip').value,sets:parseInt(document.getElementById('ae-sets').value)||3,reps:document.getElementById('ae-reps').value||'10–12',tempo:'2-1-2',shoulderSafe:document.getElementById('ae-shoulder').checked,yt:document.getElementById('ae-yt').value.trim(),note:document.getElementById('ae-note').value.trim(),custom:true};
+  EX_DB.push(ex);
+  await window.saveExDBToCloud(EX_DB);
+  closeModal('modal-add-ex');renderExDB();
+};
+window.delEx = async function(id){if(!confirm('Usunąć?'))return;EX_DB=EX_DB.filter(e=>e.id!==id);await window.saveExDBToCloud(EX_DB);renderExDB();};
 
-// ══ ADD TO PLAN ══
-function openATP(exId,exName){
+// ── ADD TO PLAN ──
+window.openATP = function(exId,exName) {
   atpExId=exId;
   document.getElementById('modal-atp-title').textContent='Dodaj: '+exName;
   document.getElementById('atp-day').innerHTML=Object.values(PLAN).map(d=>`<option value="${d.num}">Trening ${d.num} – ${d.name}</option>`).join('');
   const ex=EX_DB.find(e=>e.id===exId);
   if(ex){document.getElementById('atp-sets').value=ex.sets||3;document.getElementById('atp-reps').value=ex.reps||'10–12';}
   openModal('modal-atp');
-}
-function confirmATP(){
+};
+window.confirmATP = async function() {
   if(!atpExId)return;
   const dn=parseInt(document.getElementById('atp-day').value);
   const ex=EX_DB.find(e=>e.id===atpExId);
   if(!ex||!PLAN[dn])return;
-  if(PLAN[dn].exercises.some(e=>e.id===atpExId)){alert('To ćwiczenie już jest w tym planie!');return;}
+  if(PLAN[dn].exercises.some(e=>e.id===atpExId)){alert('Już jest w tym planie!');return;}
   PLAN[dn].exercises.push({id:ex.id,name:ex.name,equip:ex.equip||'',sets:parseInt(document.getElementById('atp-sets').value)||3,reps:document.getElementById('atp-reps').value||ex.reps,tempo:ex.tempo||'2-1-2',note:ex.note||''});
-  savePlan();closeModal('modal-atp');
-  alert(`Dodano do Treningu ${dn}!`);
-}
+  await window.savePlanToCloud(PLAN);
+  closeModal('modal-atp');alert(`Dodano do Treningu ${dn}!`);
+};
 
-// ══ PLANS ══
-function renderPlans(){
+// ── PLANS ──
+window.renderPlans = function() {
   const list=document.getElementById('plan-days-list');list.innerHTML='';
-  if(!Object.keys(PLAN).length){list.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>Brak planów. Kliknij "+ Nowy plan" lub dodaj ćwiczenie z bazy.</p></div>';return;}
+  if(!Object.keys(PLAN).length){list.innerHTML='<div class="empty"><p>Brak planów. Kliknij + Nowy.</p></div>';return;}
   Object.values(PLAN).forEach(day=>{
     const card=document.createElement('div');card.className='plan-card';card.id='pc-'+day.num;
     card.innerHTML=`
       <div class="plan-card-header" onclick="togglePC(${day.num})">
         <div><div style="display:flex;align-items:center;gap:10px"><div class="plan-num">Trening ${day.num}</div><span class="badge badge-muted">${day.exercises.length} ćw.</span></div><div style="font-size:13px;color:var(--muted);margin-top:2px">${day.name}</div></div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button onclick="event.stopPropagation();deletePlan(${day.num})" style="width:30px;height:30px;border-radius:6px;background:rgba(231,76,60,.1);border:none;color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px">×</button>
+          <button onclick="event.stopPropagation();deletePlan(${day.num})" style="width:30px;height:30px;border-radius:6px;background:rgba(231,76,60,.1);border:none;color:var(--red);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">×</button>
           <svg class="plan-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
       <div class="plan-card-body">
-        <div style="margin-bottom:10px"><label>Nazwa treningu</label><input type="text" value="${day.name}" onchange="PLAN[${day.num}].name=this.value;savePlan();" /></div>
-        <div style="margin-bottom:12px"><label>Rozgrzewka</label><input type="text" value="${day.warmup||''}" onchange="PLAN[${day.num}].warmup=this.value;savePlan();" /></div>
-        <div class="sec-title" style="font-size:14px;margin-bottom:8px"><span></span>Ćwiczenia w planie</div>
-        <div id="pex-${day.num}">
-          ${day.exercises.map((ex,ei)=>`
-            <div class="plan-ex-item">
-              <div style="flex:1"><div class="plan-ex-name">${ex.name}</div><div class="plan-ex-meta">${ex.sets} serie × ${ex.reps} · ${ex.tempo}</div></div>
-              <div style="display:flex;gap:5px">
-                <button onclick="movePEx(${day.num},${ei},-1)" style="width:26px;height:26px;border-radius:5px;background:var(--bg4);border:none;color:var(--muted);cursor:pointer;font-size:13px">↑</button>
-                <button onclick="movePEx(${day.num},${ei},1)" style="width:26px;height:26px;border-radius:5px;background:var(--bg4);border:none;color:var(--muted);cursor:pointer;font-size:13px">↓</button>
-                <button onclick="remPEx(${day.num},${ei})" style="width:26px;height:26px;border-radius:5px;background:rgba(231,76,60,.1);border:none;color:var(--red);cursor:pointer;font-size:16px">×</button>
-              </div>
-            </div>`).join('')}
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:8px;padding:8px;background:var(--bg3);border-radius:var(--rs)">
-          💡 Dodaj ćwiczenia z zakładki <strong style="color:var(--text)">Baza</strong> → przycisk "+ Dodaj do planu"
-        </div>
+        <div style="margin-bottom:10px"><label>Nazwa</label><input type="text" value="${day.name}" onchange="PLAN[${day.num}].name=this.value;savePlanToCloud(PLAN);" /></div>
+        <div style="margin-bottom:12px"><label>Rozgrzewka</label><input type="text" value="${day.warmup||''}" onchange="PLAN[${day.num}].warmup=this.value;savePlanToCloud(PLAN);" /></div>
+        <div style="font-size:14px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;margin-bottom:8px;color:var(--text)">Ćwiczenia</div>
+        ${day.exercises.map((ex,ei)=>`
+          <div class="plan-ex-item">
+            <div style="flex:1"><div class="plan-ex-name">${ex.name}</div><div class="plan-ex-meta">${ex.sets} serie × ${ex.reps} · ${ex.tempo}</div></div>
+            <div style="display:flex;gap:5px">
+              <button onclick="movePEx(${day.num},${ei},-1)" style="width:26px;height:26px;border-radius:5px;background:var(--bg4);border:none;color:var(--muted);cursor:pointer;font-size:13px">↑</button>
+              <button onclick="movePEx(${day.num},${ei},1)" style="width:26px;height:26px;border-radius:5px;background:var(--bg4);border:none;color:var(--muted);cursor:pointer;font-size:13px">↓</button>
+              <button onclick="remPEx(${day.num},${ei})" style="width:26px;height:26px;border-radius:5px;background:rgba(231,76,60,.1);border:none;color:var(--red);cursor:pointer;font-size:18px">×</button>
+            </div>
+          </div>`).join('')}
+        <div style="font-size:12px;color:var(--muted);margin-top:8px;padding:8px;background:var(--bg3);border-radius:var(--rs)">💡 Dodaj ćwiczenia z zakładki <strong style="color:var(--text)">Baza</strong></div>
       </div>`;
     list.appendChild(card);
   });
-}
+};
+window.togglePC = function(n){const c=document.getElementById('pc-'+n);if(!c)return;const was=c.classList.contains('open');document.querySelectorAll('.plan-card.open').forEach(x=>x.classList.remove('open'));if(!was)c.classList.add('open');};
+window.addNewPlan = async function(){const nums=Object.keys(PLAN).map(Number);const nn=nums.length?Math.max(...nums)+1:1;PLAN[nn]={num:nn,name:`Mój trening ${nn}`,warmup:'',exercises:[]};await savePlanToCloud(PLAN);renderPlans();renderDayChips();setTimeout(()=>togglePC(nn),100);};
+window.deletePlan = async function(n){if(!confirm(`Usunąć Trening ${n}?`))return;delete PLAN[n];const keys=Object.keys(PLAN).map(Number).sort((a,b)=>a-b);const np={};keys.forEach((k,i)=>{np[i+1]={...PLAN[k],num:i+1};});Object.keys(PLAN).forEach(k=>delete PLAN[k]);Object.assign(PLAN,np);await savePlanToCloud(PLAN);renderPlans();renderDayChips();};
+window.remPEx = async function(dn,ei){PLAN[dn].exercises.splice(ei,1);await savePlanToCloud(PLAN);renderPlans();};
+window.movePEx = async function(dn,ei,dir){const e=PLAN[dn].exercises;const ti=ei+dir;if(ti<0||ti>=e.length)return;[e[ei],e[ti]]=[e[ti],e[ei]];await savePlanToCloud(PLAN);renderPlans();};
 
-function togglePC(n){const c=document.getElementById('pc-'+n);if(!c)return;const was=c.classList.contains('open');document.querySelectorAll('.plan-card.open').forEach(x=>x.classList.remove('open'));if(!was)c.classList.add('open');}
-
-function addNewPlan(){
-  const nums=Object.keys(PLAN).map(Number);const nn=nums.length?Math.max(...nums)+1:1;
-  PLAN[nn]={num:nn,name:`Mój trening ${nn}`,warmup:'',exercises:[]};
-  savePlan();renderPlans();renderDayChips();setTimeout(()=>togglePC(nn),100);
-}
-
-function deletePlan(n){
-  if(!confirm(`Usunąć Trening ${n}?`))return;
-  delete PLAN[n];
-  const keys=Object.keys(PLAN).map(Number).sort((a,b)=>a-b);
-  const np={};keys.forEach((k,i)=>{np[i+1]={...PLAN[k],num:i+1};});
-  Object.keys(PLAN).forEach(k=>delete PLAN[k]);Object.assign(PLAN,np);
-  savePlan();renderPlans();renderDayChips();
-}
-
-function remPEx(dn,ei){PLAN[dn].exercises.splice(ei,1);savePlan();renderPlans();}
-function movePEx(dn,ei,dir){const e=PLAN[dn].exercises;const ti=ei+dir;if(ti<0||ti>=e.length)return;[e[ei],e[ti]]=[e[ti],e[ei]];savePlan();renderPlans();}
-
-// ══ SETTINGS ══
-function exportData(){const b=new Blob([JSON.stringify({workouts:DB.workouts,plan:PLAN,exerciseDB:EX_DB},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dzikus-gym-backup.json';a.click();}
-function clearData(){if(confirm('Usunąć WSZYSTKIE dane? Tego nie można cofnąć.')){DB={workouts:[]};saveDB();closeModal('modal-settings');renderHome();alert('Dane wyczyszczone.');}}
-
-// ══ INIT ══
-renderHome();
+// ── SETTINGS ──
+window.exportData = function(){const b=new Blob([JSON.stringify({workouts:DB.workouts,plan:PLAN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dzikus-gym-backup.json';a.click();};
 </script>
 </body>
 </html>
