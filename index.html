@@ -1106,5 +1106,15 @@ window.movePEx = async function(dn,ei,dir){const e=PLAN[dn].exercises;const ti=e
 // ── SETTINGS ──
 window.exportData = function(){const b=new Blob([JSON.stringify({workouts:DB.workouts,plan:PLAN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dzikus-gym-backup.json';a.click();};
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/DZIKUS-Gym/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+</script>
 </body>
 </html>
