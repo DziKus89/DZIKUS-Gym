@@ -449,7 +449,7 @@ canvas{width:100%;height:100%}
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, orderBy, query, onSnapshot, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, orderBy, query, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCJhpI2FdoW-pWTkn4vkVCCUHjsKWVFAEc",
@@ -464,13 +464,73 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 
-// ── EXPOSE TO WINDOW ──
-window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, doc, setDoc, getDoc, collection, addDoc, getDocs, orderBy, query, onSnapshot, deleteDoc };
+// ── CLOUD FUNCTIONS – dostępne globalnie ──
+window.saveWorkoutToCloud = async (workout) => {
+  if (!window._currentUser) { console.warn('saveWorkout: brak usera'); return; }
+  window.setSyncStatus('syncing', 'Zapisywanie...');
+  try {
+    await setDoc(doc(db, 'users', window._currentUser.uid, 'workouts', String(workout.id)), workout);
+    window.setSyncStatus('synced', 'Zsynchronizowano');
+    console.log('Trening zapisany w chmurze:', workout.id);
+  } catch(e) {
+    window.setSyncStatus('error', 'Błąd zapisu: ' + e.message);
+    console.error('saveWorkout error:', e);
+  }
+};
+
+window.savePlanToCloud = async (plan) => {
+  if (!window._currentUser) return;
+  try {
+    await setDoc(doc(db, 'users', window._currentUser.uid, 'config', 'plan'), { data: JSON.stringify(plan) });
+    console.log('Plan zapisany');
+  } catch(e) { console.error('savePlan error:', e); }
+};
+
+window.saveExDBToCloud = async (exdb) => {
+  if (!window._currentUser) return;
+  try {
+    const customOnly = exdb.filter(e => e.custom);
+    await setDoc(doc(db, 'users', window._currentUser.uid, 'config', 'exdb'), { data: JSON.stringify(customOnly) });
+  } catch(e) { console.error('saveExDB error:', e); }
+};
+
+window.loadUserData = async (uid) => {
+  window.setSyncStatus('syncing', 'Pobieranie danych...');
+  try {
+    // Wczytaj plan
+    const planDoc = await getDoc(doc(db, 'users', uid, 'config', 'plan'));
+    if (planDoc.exists()) {
+      window.PLAN = JSON.parse(planDoc.data().data);
+      console.log('Plan wczytany z chmury');
+    }
+    // Wczytaj własne ćwiczenia
+    const exDoc = await getDoc(doc(db, 'users', uid, 'config', 'exdb'));
+    if (exDoc.exists()) {
+      const customEx = JSON.parse(exDoc.data().data);
+      customEx.forEach(ce => {
+        if (!window.EX_DB.find(e => e.id === ce.id)) window.EX_DB.push(ce);
+      });
+    }
+    // Wczytaj treningi
+    const wSnap = await getDocs(query(
+      collection(db, 'users', uid, 'workouts'),
+      orderBy('date', 'asc')
+    ));
+    window.DB.workouts = [];
+    wSnap.forEach(d => window.DB.workouts.push(d.data()));
+    console.log('Treningi wczytane:', window.DB.workouts.length);
+    window.setSyncStatus('synced', 'Zsynchronizowano (' + window.DB.workouts.length + ' treningów)');
+  } catch(e) {
+    window.setSyncStatus('error', 'Błąd: ' + e.message);
+    console.error('loadUserData error:', e);
+  }
+};
 
 // ── AUTH STATE ──
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     window._currentUser = user;
+    console.log('Zalogowany:', user.email);
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('main-app').style.display = 'block';
     document.getElementById('bottom-nav').style.display = 'flex';
@@ -481,64 +541,69 @@ onAuthStateChanged(auth, async (user) => {
     window.setSyncStatus('synced', 'Zsynchronizowano');
   } else {
     window._currentUser = null;
+    console.log('Wylogowany');
     document.getElementById('auth-screen').classList.remove('hidden');
     document.getElementById('main-app').style.display = 'none';
     document.getElementById('bottom-nav').style.display = 'none';
+    // Reset danych lokalnych
+    window.DB = { workouts: [] };
   }
 });
 
-// ── SAVE / LOAD ──
-window.saveWorkoutToCloud = async (workout) => {
-  if (!window._currentUser) return;
-  window.setSyncStatus('syncing', 'Zapisywanie...');
+// ── AUTH ACTIONS ──
+window.doLogin = async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('auth-err');
+  errEl.style.color = 'var(--red)';
+  if (!email || !pass) { errEl.textContent = 'Wpisz email i hasło'; return; }
   try {
-    const { db, doc, setDoc } = window._fb;
-    await setDoc(doc(db, 'users', window._currentUser.uid, 'workouts', String(workout.id)), workout);
-    window.setSyncStatus('synced', 'Zsynchronizowano');
-  } catch(e) { window.setSyncStatus('error', 'Błąd zapisu'); console.error(e); }
-};
-
-window.savePlanToCloud = async (plan) => {
-  if (!window._currentUser) return;
-  try {
-    const { db, doc, setDoc } = window._fb;
-    await setDoc(doc(db, 'users', window._currentUser.uid, 'config', 'plan'), { data: JSON.stringify(plan) });
-  } catch(e) { console.error(e); }
-};
-
-window.saveExDBToCloud = async (exdb) => {
-  if (!window._currentUser) return;
-  try {
-    const { db, doc, setDoc } = window._fb;
-    await setDoc(doc(db, 'users', window._currentUser.uid, 'config', 'exdb'), { data: JSON.stringify(exdb) });
-  } catch(e) { console.error(e); }
-};
-
-window.loadUserData = async (uid) => {
-  window.setSyncStatus('syncing', 'Pobieranie danych...');
-  try {
-    const { db, doc, getDoc, collection, getDocs, orderBy, query } = window._fb;
-    // Load plan
-    const planDoc = await getDoc(doc(db, 'users', uid, 'config', 'plan'));
-    if (planDoc.exists()) {
-      window.PLAN = JSON.parse(planDoc.data().data);
-    }
-    // Load custom exdb
-    const exDoc = await getDoc(doc(db, 'users', uid, 'config', 'exdb'));
-    if (exDoc.exists()) {
-      const cloudEx = JSON.parse(exDoc.data().data);
-      const customOnly = cloudEx.filter(e => e.custom);
-      customOnly.forEach(ce => { if (!window.EX_DB.find(e => e.id === ce.id)) window.EX_DB.push(ce); });
-    }
-    // Load workouts
-    const wSnap = await getDocs(query(collection(db, 'users', uid, 'workouts'), orderBy('date', 'asc')));
-    window.DB.workouts = [];
-    wSnap.forEach(d => window.DB.workouts.push(d.data()));
-    window.setSyncStatus('synced', 'Zsynchronizowano');
+    await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
-    window.setSyncStatus('error', 'Błąd pobierania');
-    console.error(e);
+    const msgs = {
+      'auth/user-not-found': 'Nie znaleziono konta',
+      'auth/wrong-password': 'Błędne hasło',
+      'auth/invalid-email': 'Nieprawidłowy email',
+      'auth/invalid-credential': 'Błędny email lub hasło'
+    };
+    errEl.textContent = msgs[e.code] || 'Błąd: ' + e.code;
   }
+};
+
+window.doRegister = async () => {
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  const errEl = document.getElementById('auth-err');
+  errEl.style.color = 'var(--red)';
+  if (!email || !pass) { errEl.textContent = 'Wpisz email i hasło'; return; }
+  if (pass !== pass2) { errEl.textContent = 'Hasła nie są identyczne'; return; }
+  if (pass.length < 6) { errEl.textContent = 'Hasło musi mieć min. 6 znaków'; return; }
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    const msgs = {
+      'auth/email-already-in-use': 'Konto z tym emailem już istnieje',
+      'auth/invalid-email': 'Nieprawidłowy email'
+    };
+    errEl.textContent = msgs[e.code] || 'Błąd: ' + e.code;
+  }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  closeModal('modal-settings');
+};
+
+window.doResetPassword = async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const errEl = document.getElementById('auth-err');
+  if (!email) { errEl.textContent = 'Wpisz email aby zresetować hasło'; return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    errEl.style.color = 'var(--green)';
+    errEl.textContent = 'Email resetujący wysłany!';
+  } catch(e) { errEl.textContent = 'Błąd: ' + e.code; }
 };
 </script>
 
@@ -911,10 +976,17 @@ window.finishWorkout = async function() {
   clearInterval(workoutTimer);
   const m=String(Math.floor(workoutSeconds/60)).padStart(2,'0'),s=String(workoutSeconds%60).padStart(2,'0');
   activeWorkout.duration=m+':'+s;
-  DB.workouts.push(deepClone(activeWorkout));
-  await window.saveWorkoutToCloud(activeWorkout);
+  const workoutCopy = deepClone(activeWorkout);
+  DB.workouts.push(workoutCopy);
   skipRest();activeWorkout=null;workoutSeconds=0;
   showPage('page-home');
+  // Zapisz do chmury po przejściu na home
+  try {
+    await window.saveWorkoutToCloud(workoutCopy);
+  } catch(e) {
+    console.error('Błąd zapisu treningu:', e);
+    window.setSyncStatus('error', 'Błąd zapisu – spróbuj ponownie');
+  }
 };
 
 // ── HISTORY ──
