@@ -422,6 +422,7 @@ canvas{width:100%;height:100%}
     <div style="font-size:13px;color:var(--muted);margin-bottom:12px" id="settings-email">–</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn btn-ghost btn-sm" onclick="exportData()">Eksportuj JSON</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadDzikusPlan()" style="color:var(--gold);border-color:rgba(245,200,66,.3)">⚡ Załaduj plan DziKus</button>
       <button class="btn btn-danger btn-sm" onclick="doLogout()">Wyloguj</button>
     </div>
     <div class="divider"></div>
@@ -1284,6 +1285,76 @@ window.dismissResume = function() {
   window.clearActiveWorkoutLocally();
   window._pendingResumePayload = null;
   document.getElementById('resume-banner').style.display = 'none';
+};
+
+// ── PRESET PLAN DZIKUS ──
+window.loadDzikusPlan = async function() {
+  if(!confirm('Załadować plan DziKus (3 treningi maszynowe)?\n\nUWAGA: Nadpisze aktualny plan treningowy!')) return;
+
+  const DZIKUS_PLAN = {
+    1: {
+      num: 1,
+      name: 'Push – Klatka / Triceps / Barki',
+      warmup: '5 min rower stacjonarny + rotacje barków',
+      exercises: [
+        { id: 'chest_machine_press',      name: 'Wyciskanie klatki (maszyna)',               equip: 'maszyna', sets: 4, reps: '6–8',   tempo: '2-0-2', note: 'Główny ruch masy. Łokcie ~45° do tułowia' },
+        { id: 'bench_incline_dumbbell',   name: 'Wyciskanie hantli skos górny',               equip: 'wolne',   sets: 3, reps: '10–12', tempo: '2-0-2', note: 'Górna klatka priorytet. Chwyt neutralny' },
+        { id: 'pec_deck',                 name: 'Rozpiętki – maszyna butterfly (Pec Deck)',   equip: 'maszyna', sets: 3, reps: '12–15', tempo: '2-1-2', note: 'Izolacja klatki. Stretch na końcu' },
+        { id: 'ohp_machine',              name: 'Wyciskanie nad głowę (maszyna)',              equip: 'maszyna', sets: 3, reps: '10–12', tempo: '2-0-2', note: 'Bezpieczne dla barku po artroskopii' },
+        { id: 'lateral_raise_machine',    name: 'Unoszenie w bok (maszyna)',                  equip: 'maszyna', sets: 3, reps: '15–20', tempo: '2-0-2', note: 'Boczna głowa barku – szerokość sylwetki' },
+        { id: 'dips_chest',               name: 'Triceps na wyciągu (linka prosta)',           equip: 'kabel',   sets: 3, reps: '12–15', tempo: '2-1-2', note: 'Prostowanie ramion – łokcie przy tułowiu' },
+      ]
+    },
+    2: {
+      num: 2,
+      name: 'Pull – Plecy / Biceps',
+      warmup: '5 min rower + facepull rozgrzewkowy 2×20',
+      exercises: [
+        { id: 'lat_pulldown_wide',        name: 'Ściąganie drążka nachwytem (szerokie)',       equip: 'kabel',   sets: 4, reps: '8–10',  tempo: '2-1-2', note: 'Szerokość pleców. Do klatki, nie za głowę' },
+        { id: 'seated_row_machine',       name: 'Wiosłowanie siedząc (maszyna)',               equip: 'maszyna', sets: 4, reps: '8–10',  tempo: '2-1-2', note: 'Grubość pleców. Łopatki razem na końcu' },
+        { id: 'lat_pulldown_neutral',     name: 'Ściąganie chwytem neutralnym',                equip: 'kabel',   sets: 3, reps: '10–12', tempo: '2-1-2', note: 'Dolne łaty. Najłagodniejsze dla barku' },
+        { id: 'seated_row_cable',         name: 'Wiosłowanie siedząc na wyciągu',              equip: 'kabel',   sets: 3, reps: '10–12', tempo: '2-1-2', note: 'Środek pleców' },
+        { id: 'preacher_curl_machine',    name: 'Uginanie na maszynie predkursorowej',         equip: 'maszyna', sets: 4, reps: '10–12', tempo: '2-1-2', note: 'Biceps – łokieć bezpieczny. Pełny zakres' },
+        { id: 'hammer_curl_cable',        name: 'Hammer curl na wyciągu dolnym',               equip: 'kabel',   sets: 3, reps: '12–15', tempo: '2-1-2', note: 'Brachialis – grubość ramienia' },
+      ]
+    },
+    3: {
+      num: 3,
+      name: 'Ramiona + Core + Cardio',
+      warmup: '5 min orbitrek',
+      exercises: [
+        { id: 'ohp_machine',              name: 'Wyciskanie barków maszyna',                  equip: 'maszyna', sets: 3, reps: '10–12', tempo: '2-0-2', note: 'Objętość barków' },
+        { id: 'lateral_raise_dumbbell',   name: 'Unoszenie ramion w bok (hantle)',             equip: 'wolne',   sets: 4, reps: '15–20', tempo: '2-0-2', note: 'Szerokość sylwetki' },
+        { id: 'tricep_overhead_cable',    name: 'Triceps overhead na wyciągu',                 equip: 'kabel',   sets: 3, reps: '12–15', tempo: '2-1-2', note: 'Długa głowa tricepsa – objętość ramienia' },
+        { id: 'cable_bicep_curl',         name: 'Uginanie wyciąg dolny (supinacja)',           equip: 'kabel',   sets: 3, reps: '12–15', tempo: '2-1-2', note: 'Peak bicepsa' },
+        { id: 'leg_press',                name: 'Prasa nożna (lekka)',                         equip: 'maszyna', sets: 3, reps: '15–20', tempo: '2-1-2', note: 'Nogi – Achilles bezpieczny. Stopy wysoko' },
+        { id: 'facepull',                 name: 'Facepull (przyciąganie liny do twarzy)',      equip: 'kabel',   sets: 3, reps: '15–20', tempo: '2-1-2', note: 'OBOWIĄZKOWE – zdrowie barków' },
+      ]
+    }
+  };
+
+  // Dodaj brakujące ćwiczenia do EX_DB jeśli ich nie ma
+  const extraEx = [
+    { id: 'preacher_curl_machine', name: 'Uginanie na maszynie predkursorowej', muscle: 'biceps',   equip: 'maszyna', sets: 4, reps: '10–12', tempo: '2-1-2', shoulderSafe: true,  yt: 'https://www.youtube.com/results?search_query=preacher+curl+machine+technique', note: 'Łokieć bezpieczny. Pełny zakres ruchu' },
+    { id: 'hammer_curl_cable',     name: 'Hammer curl na wyciągu dolnym',       muscle: 'biceps',   equip: 'kabel',   sets: 3, reps: '12–15', tempo: '2-1-2', shoulderSafe: true,  yt: 'https://www.youtube.com/results?search_query=cable+hammer+curl+technique',    note: 'Brachialis – grubość ramienia' },
+    { id: 'tricep_overhead_cable', name: 'Triceps overhead na wyciągu',         muscle: 'triceps',  equip: 'kabel',   sets: 3, reps: '12–15', tempo: '2-1-2', shoulderSafe: false, yt: 'https://www.youtube.com/results?search_query=cable+overhead+tricep+extension', note: 'Długa głowa tricepsa. Łokcie przy głowie' },
+    { id: 'cable_bicep_curl',      name: 'Uginanie wyciąg dolny (supinacja)',   muscle: 'biceps',   equip: 'kabel',   sets: 3, reps: '12–15', tempo: '2-1-2', shoulderSafe: true,  yt: 'https://www.youtube.com/results?search_query=cable+bicep+curl+technique',     note: 'Peak bicepsa. Supinacja nadgarstka na górze' },
+    { id: 'leg_press',             name: 'Prasa nożna',                         muscle: 'nogi',     equip: 'maszyna', sets: 3, reps: '15–20', tempo: '2-1-2', shoulderSafe: true,  yt: 'https://www.youtube.com/results?search_query=leg+press+technique',             note: 'Stopy wysoko – Achilles bezpieczny. Kolana nie do środka' },
+  ];
+  extraEx.forEach(ex => { if(!window.EX_DB.find(e => e.id === ex.id)) window.EX_DB.push(ex); });
+
+  // Nadpisz plan
+  Object.keys(window.PLAN).forEach(k => delete window.PLAN[k]);
+  Object.assign(window.PLAN, DZIKUS_PLAN);
+
+  // Zapisz do chmury
+  await window.savePlanToCloud(window.PLAN);
+  await window.saveExDBToCloud(window.EX_DB);
+
+  closeModal('modal-settings');
+  window.renderPlans();
+  window.renderDayChips();
+  alert('✅ Plan DziKus załadowany!\n\nTrening A – Push (Klatka/Triceps/Barki)\nTrening B – Pull (Plecy/Biceps)\nTrening C – Ramiona/Core/Cardio');
 };
 
 window.exportData = function(){const b=new Blob([JSON.stringify({workouts:DB.workouts,plan:PLAN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dzikus-gym-backup.json';a.click();};
