@@ -207,6 +207,7 @@ canvas{width:100%;height:100%}
       <div style="text-align:center;margin-top:10px"><span style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline" onclick="doResetPassword()">Zapomniałem hasła</span></div>
     </div>
     <div id="auth-register" style="display:none">
+      <div class="auth-field"><label>Imię / Nick</label><input type="text" id="reg-name" placeholder="np. Patryk" autocomplete="name"/></div>
       <div class="auth-field"><label>Email</label><input type="email" id="reg-email" placeholder="twoj@email.com" autocomplete="email"/></div>
       <div class="auth-field"><label>Hasło (min. 6 znaków)</label><input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password"/></div>
       <div class="auth-field"><label>Powtórz hasło</label><input type="password" id="reg-pass2" placeholder="••••••••" autocomplete="new-password"/></div>
@@ -219,10 +220,18 @@ canvas{width:100%;height:100%}
 
 <div class="app" id="main-app" style="display:none">
 
+<!-- BANER WZNOWIENIA TRENINGU -->
+<div id="resume-banner" style="display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:300;background:var(--gold);padding:10px 14px;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.4)">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+  <div style="flex:1;font-size:12px;font-weight:600;color:#000;line-height:1.4" id="resume-banner-text">Niezakończony trening</div>
+  <button onclick="resumeWorkout()" style="background:#000;color:var(--gold);border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;white-space:nowrap">Wznów</button>
+  <button onclick="dismissResume()" style="background:rgba(0,0,0,.15);color:#000;border:none;border-radius:6px;padding:6px 8px;font-size:14px;font-weight:700;cursor:pointer">×</button>
+</div>
+
 <!-- HOME -->
 <div class="page active" id="page-home">
   <div class="logo-header">
-    <div><div class="logo-name"><span>DZIKUS</span> GYM</div><div class="logo-sub">Patryk Kuczer · Dziennik</div></div>
+    <div><div class="logo-name"><span>DZIKUS</span> GYM</div><div class="logo-sub" id="home-user-sub">Dziennik treningowy</div></div>
     <div class="header-date" id="home-date"></div>
   </div>
   <div class="sync-bar" id="sync-bar">
@@ -409,6 +418,7 @@ canvas{width:100%;height:100%}
     </div>
     <div class="divider"></div>
     <div class="sec-title" style="font-size:15px"><span></span>Konto</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px" id="settings-name">–</div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:12px" id="settings-email">–</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn btn-ghost btn-sm" onclick="exportData()">Eksportuj JSON</button>
@@ -416,7 +426,7 @@ canvas{width:100%;height:100%}
     </div>
     <div class="divider"></div>
     <div style="text-align:center;padding:10px 0 4px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);letter-spacing:2px">DZIKUS GYM v2.1</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);letter-spacing:2px">DZIKUS GYM v2.2</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px">Patryk Kuczer · Firebase Cloud · 2026</div>
     </div>
     <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="closeModal('modal-settings')">Zamknij</button>
@@ -448,7 +458,7 @@ canvas{width:100%;height:100%}
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, collection, getDocs, orderBy, query, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -494,6 +504,14 @@ window.saveExDBToCloud = async (exdb) => {
   } catch(e) { console.error('saveExDB error:', e); }
 };
 
+window.deleteWorkoutFromCloud = async (workoutId) => {
+  if (!window._currentUser) return;
+  try {
+    await deleteDoc(doc(db, 'users', window._currentUser.uid, 'workouts', String(workoutId)));
+    console.log('Trening usunięty z chmury:', workoutId);
+  } catch(e) { console.error('deleteWorkout error:', e); }
+};
+
 window.loadUserData = async (uid) => {
   window.setSyncStatus('syncing', 'Pobieranie danych...');
   try {
@@ -534,11 +552,17 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('main-app').style.display = 'block';
     document.getElementById('bottom-nav').style.display = 'flex';
+    const displayName = user.displayName || user.email.split('@')[0];
+    document.getElementById('settings-name').textContent = displayName;
     document.getElementById('settings-email').textContent = user.email;
-    document.getElementById('sync-user').textContent = user.email;
+    document.getElementById('sync-user').textContent = displayName + ' · Wyloguj';
+    const homeUserSub = document.getElementById('home-user-sub');
+    if(homeUserSub) homeUserSub.textContent = displayName + ' · Dziennik';
     await window.loadUserData(user.uid);
     window.renderHome();
     window.setSyncStatus('synced', 'Zsynchronizowano');
+    // Sprawdź czy jest niezakończony trening
+    window.checkResumeWorkout();
   } else {
     window._currentUser = null;
     console.log('Wylogowany');
@@ -571,16 +595,19 @@ window.doLogin = async () => {
 };
 
 window.doRegister = async () => {
+  const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const pass = document.getElementById('reg-pass').value;
   const pass2 = document.getElementById('reg-pass2').value;
   const errEl = document.getElementById('auth-err');
   errEl.style.color = 'var(--red)';
+  if (!name) { errEl.textContent = 'Wpisz imię lub nick'; return; }
   if (!email || !pass) { errEl.textContent = 'Wpisz email i hasło'; return; }
   if (pass !== pass2) { errEl.textContent = 'Hasła nie są identyczne'; return; }
   if (pass.length < 6) { errEl.textContent = 'Hasło musi mieć min. 6 znaków'; return; }
   try {
-    await createUserWithEmailAndPassword(auth, email, pass);
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
   } catch(e) {
     const msgs = {
       'auth/email-already-in-use': 'Konto z tym emailem już istnieje',
@@ -903,8 +930,12 @@ window.startWorkout = function() {
   activeWorkout={id:Date.now(),day:dayNum,date:new Date().toISOString(),note:document.getElementById('pre-note').value,duration:null,
     exercises:plan.exercises.map(ex=>({...ex,sets:Array.from({length:ex.sets||3},(_,i)=>({num:i+1,kg:'',reps:'',done:false}))}))};
   workoutSeconds=0;clearInterval(workoutTimer);
-  workoutTimer=setInterval(()=>{workoutSeconds++;const m=String(Math.floor(workoutSeconds/60)).padStart(2,'0'),s=String(workoutSeconds%60).padStart(2,'0');document.getElementById('workout-clock').textContent=m+':'+s;document.getElementById('workout-vol').textContent=calcVol(activeWorkout)+' kg';},1000);
+  workoutTimer=setInterval(()=>{workoutSeconds++;const m=String(Math.floor(workoutSeconds/60)).padStart(2,'0'),s=String(workoutSeconds%60).padStart(2,'0');document.getElementById('workout-clock').textContent=m+':'+s;document.getElementById('workout-vol').textContent=calcVol(activeWorkout)+' kg';
+    // Auto-save co 10 sekund
+    if(workoutSeconds%10===0) window.saveActiveWorkoutLocally();
+  },1000);
   document.getElementById('workout-title').textContent=`Trening ${dayNum} – ${plan.name}`;
+  window.saveActiveWorkoutLocally();
   renderExercises();showPage('page-workout');
 };
 
@@ -949,6 +980,7 @@ window.toggleSet = function(ei,si) {
   const kEl=document.querySelector(`#sr-${ei}-${si} input[placeholder="kg"]`);
   const rEl=document.querySelector(`#sr-${ei}-${si} input[placeholder="powt."]`);
   st.kg=parseFloat(kEl?.value)||0;st.reps=parseInt(rEl?.value)||0;
+  window.saveActiveWorkoutLocally();
   if(st.done){
     const ex=activeWorkout.exercises[ei];let ni='';
     if(si+1<ex.sets.length)ni=`Następna seria ${si+2} – ${ex.name}`;
@@ -973,14 +1005,18 @@ window.skipRest = function(){clearInterval(restTimer);document.getElementById('r
 // ── FINISH WORKOUT ──
 window.finishWorkout = async function() {
   if(!activeWorkout)return;
+  if(!window._currentUser){
+    alert('Brak połączenia z kontem! Zaloguj się ponownie przed zakończeniem treningu.');
+    return;
+  }
   clearInterval(workoutTimer);
   const m=String(Math.floor(workoutSeconds/60)).padStart(2,'0'),s=String(workoutSeconds%60).padStart(2,'0');
   activeWorkout.duration=m+':'+s;
   const workoutCopy = deepClone(activeWorkout);
   DB.workouts.push(workoutCopy);
   skipRest();activeWorkout=null;workoutSeconds=0;
+  window.clearActiveWorkoutLocally(); // Wyczyść po zapisie
   showPage('page-home');
-  // Zapisz do chmury po przejściu na home
   try {
     await window.saveWorkoutToCloud(workoutCopy);
   } catch(e) {
@@ -994,11 +1030,25 @@ window.renderHistory = function() {
   const list=document.getElementById('history-list');
   if(!DB.workouts.length){list.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg><p>Brak zapisanych treningów</p></div>';return;}
   list.innerHTML=[...DB.workouts].reverse().map((w,ri)=>{const i=DB.workouts.length-1-ri;const d=new Date(w.date);
-    return `<div class="hist-item" onclick="openWDetail(${i})">
-      <div class="hist-top"><span class="hist-day" style="color:var(--accent)">Trening ${w.day}</span><span class="badge badge-muted">${d.toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short'})}</span></div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:6px">${PLAN[w.day]?.name||''}</div>
-      <div class="hist-stats"><span>⏱ ${w.duration||'–'}</span><span>📦 ${calcVol(w)} kg</span>${w.note?`<span>"${w.note}"</span>`:''}</div>
+    return `<div class="hist-item" style="position:relative">
+      <div onclick="openWDetail(${i})" style="cursor:pointer">
+        <div class="hist-top"><span class="hist-day" style="color:var(--accent)">Trening ${w.day}</span><span class="badge badge-muted">${d.toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short'})}</span></div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px">${PLAN[w.day]?.name||''}</div>
+        <div class="hist-stats"><span>⏱ ${w.duration||'–'}</span><span>📦 ${calcVol(w)} kg</span>${w.note?`<span>"${w.note}"</span>`:''}</div>
+      </div>
+      <button onclick="deleteWorkout(${i})" style="position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:6px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.2);color:var(--red);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:'Barlow',sans-serif">×</button>
     </div>`;}).join('');
+};
+
+window.deleteWorkout = async function(idx) {
+  const w = DB.workouts[idx];
+  if(!w) return;
+  const d = new Date(w.date);
+  if(!confirm(`Usunąć trening ${w.day} z dnia ${d.toLocaleDateString('pl-PL')}?\nTej operacji nie można cofnąć.`)) return;
+  DB.workouts.splice(idx, 1);
+  await window.deleteWorkoutFromCloud(w.id);
+  window.renderHistory();
+  window.renderHome();
 };
 
 window.openWDetail = function(idx) {
@@ -1176,7 +1226,76 @@ window.remPEx = async function(dn,ei){PLAN[dn].exercises.splice(ei,1);await save
 window.movePEx = async function(dn,ei,dir){const e=PLAN[dn].exercises;const ti=ei+dir;if(ti<0||ti>=e.length)return;[e[ei],e[ti]]=[e[ti],e[ei]];await savePlanToCloud(PLAN);renderPlans();};
 
 // ── SETTINGS ──
+// ── AKTYWNY TRENING – LOKALNY ZAPIS (odporność na wyjście z aplikacji) ──
+window.saveActiveWorkoutLocally = function() {
+  if(!activeWorkout) return;
+  try {
+    const payload = { workout: deepClone(activeWorkout), seconds: workoutSeconds, savedAt: Date.now() };
+    localStorage.setItem('dg_active_workout', JSON.stringify(payload));
+  } catch(e) { console.warn('localStorage save error:', e); }
+};
+
+window.clearActiveWorkoutLocally = function() {
+  try { localStorage.removeItem('dg_active_workout'); } catch(e) {}
+};
+
+window.checkResumeWorkout = function() {
+  try {
+    const raw = localStorage.getItem('dg_active_workout');
+    if(!raw) return;
+    const payload = JSON.parse(raw);
+    if(!payload?.workout) { localStorage.removeItem('dg_active_workout'); return; }
+    // Pokaż baner wznowienia
+    const banner = document.getElementById('resume-banner');
+    const w = payload.workout;
+    const d = new Date(w.date);
+    const elapsed = Math.round((Date.now() - payload.savedAt) / 60000);
+    if(banner) {
+      document.getElementById('resume-banner-text').textContent =
+        `Trening ${w.day} z ${d.toLocaleDateString('pl-PL')} (${elapsed} min temu) – niezakończony`;
+      banner.style.display = 'flex';
+    }
+    window._pendingResumePayload = payload;
+  } catch(e) { console.warn('checkResume error:', e); localStorage.removeItem('dg_active_workout'); }
+};
+
+window.resumeWorkout = function() {
+  const payload = window._pendingResumePayload;
+  if(!payload) return;
+  activeWorkout = payload.workout;
+  workoutSeconds = payload.seconds || 0;
+  clearInterval(workoutTimer);
+  workoutTimer = setInterval(() => {
+    workoutSeconds++;
+    const m=String(Math.floor(workoutSeconds/60)).padStart(2,'0'), s=String(workoutSeconds%60).padStart(2,'0');
+    document.getElementById('workout-clock').textContent = m+':'+s;
+    document.getElementById('workout-vol').textContent = calcVol(activeWorkout)+' kg';
+    if(workoutSeconds%10===0) window.saveActiveWorkoutLocally();
+  }, 1000);
+  document.getElementById('workout-title').textContent = `Trening ${activeWorkout.day} – wznowiony`;
+  document.getElementById('resume-banner').style.display = 'none';
+  window._pendingResumePayload = null;
+  renderExercises();
+  showPage('page-workout');
+};
+
+window.dismissResume = function() {
+  if(!confirm('Odrzucić niezakończony trening? Dane z tej sesji zostaną usunięte.')) return;
+  window.clearActiveWorkoutLocally();
+  window._pendingResumePayload = null;
+  document.getElementById('resume-banner').style.display = 'none';
+};
+
 window.exportData = function(){const b=new Blob([JSON.stringify({workouts:DB.workouts,plan:PLAN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dzikus-gym-backup.json';a.click();};
+
+// ── ZABEZPIECZENIE – ostrzeżenie przed zamknięciem podczas aktywnego treningu ──
+window.addEventListener('beforeunload', (e) => {
+  if (activeWorkout) {
+    e.preventDefault();
+    e.returnValue = 'Masz aktywny trening! Czy na pewno chcesz opuścić stronę? Dane mogą nie zostać zapisane.';
+    return e.returnValue;
+  }
+});
 </script>
 
 <script>
